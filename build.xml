@@ -12,6 +12,7 @@
           Until I learn how to add their manifests into a unified one.
           There are tools: http://one-jar.sourceforge.net/, http://code.google.com/p/jarjar/,
           http://proguard.sourceforge.net/
+          http://code.google.com/p/onejar-maven-plugin/
           http://maven.apache.org/plugins/maven-assembly-plugin/descriptor-refs.html#jar-with-dependencies
           http://stackoverflow.com/questions/1059851/is-it-possible-to-package-all-the-jar-dependencies-in-one-big-jar
 	-->
