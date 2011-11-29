@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+<project name="epubcheckbackend" default="app" basedir=".">
+	
+	<!--
+		TODO:
+		- build.prod.dir and build.test.dir not yet used
+		- tests not yet separated from app.
+		- can't build everything into 1 jar, because of saxon...
+		  epubcheck adds thirdparty jars via its Manifest.
+		  -> it requires a "lib" directory relative to its Main-jar
+	-->
+
+	<property name="build.dir" value="build"/>
+	<property name="build.prod.dir" value="${build.dir}/prod"/>
+	<property name="build.test.dir" value="${build.dir}/test"/>
+	<property name="classes.dir" location="${build.dir}/classes"/>
+	<property name="src.dir" location="src"/>
+	<property name="test.dir" location="test"/>
+	<property name="principal.jar.dir" location="lib"/>
+	<property name="thirdparty.lib.dir" location="thirdpartylibs"/>
+	<property name="tmp.dir" location="${build.dir}/tmp"/>
+
+	<property name="app.jar" location="${build.dir}/${ant.project.name}.jar"/>
+
+	<target name="prepare">
+		<mkdir dir="${build.dir}"/>
+		<mkdir dir="${build.test.dir}"/>
+		<mkdir dir="${classes.dir}"/>
+	</target>
+
+	<target name="clean">
+		<delete dir="${build.dir}"/>
+	</target>
+	
+	<fileset id="thirdparty.jars" dir="${thirdparty.lib.dir}">
+		<patternset>
+			<include name="*.jar"/>
+		</patternset>
+	</fileset>
+	
+	<fileset id="principal.jar" dir="${principal.jar.dir}">
+		<patternset>
+			<include name="*.jar"/>
+		</patternset>
+	</fileset>
+
+	<path id="project.classpath">
+		<pathelement location="${build.prod.dir}"/>
+		<pathelement location="${build.test.dir}"/>
+		<pathelement location="${classes.dir}"/>
+	</path>
+
+	<target name="compile" depends="prepare">
+		<javac
+			srcdir="${src.dir}"
+			destdir="${classes.dir}"
+			deprecation="on"
+			debug="on">
+			<classpath refid="project.classpath"/>
+		</javac>
+	</target>
+
+	<target name="compile-tests" depends="compile">
+		<javac
+			srcdir="${test.dir}"
+			destdir="${build.test.dir}"
+			deprecation="on"
+			debug="on">
+			<classpath refid="project.classpath"/>
+		</javac>
+	</target>
+
+	<target name="test" depends="compile-tests">
+		<junit haltonfailure="true">
+			<classpath refid="project.classpath"/>
+			<formatter type="brief" usefile="false"/>
+			<batchtest>
+				<fileset dir="${build.test.dir}"
+					includes="**/*Test.class"
+					excludes="**/HttpUnitTest.class"
+				/>
+			</batchtest>
+			<sysproperty key="doc.dir" value="${doc.dir}"/>
+			<sysproperty key="index.dir" value="${index.dir}"/>
+		</junit>
+	</target>
+
+	<target name="unjar3rdparty" description="unjar 3rd party libs into app.dir">
+		<unjar dest="${tmp.dir}">
+			<fileset refid="principal.jar"/>
+		</unjar>
+	</target>
+
+	<target name="app" depends="compile" description="copy  compiled classes into app.dir">
+		<copy todir="${tmp.dir}">
+			<fileset dir="${classes.dir}"/>
+		</copy>
+
+		<!-- make application jar file -->
+		<jar jarfile="${app.jar}"
+			basedir="${tmp.dir}">
+		    <manifest>
+		      <attribute name="Main-Class"
+		            value="org.daisy.validation.epubcheck.EpubcheckBackend"/>
+		    </manifest>
+		</jar>
+
+
+	    <delete dir="${classes.dir}"/>
+	    <delete dir="${tmp.dir}"/>
+	</target>
+
+</project>
