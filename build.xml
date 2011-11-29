@@ -5,9 +5,15 @@
 		TODO:
 		- build.prod.dir and build.test.dir not yet used
 		- tests not yet separated from app.
-		- can't build everything into 1 jar, because of saxon...
-		  epubcheck adds thirdparty jars via its Manifest.
-		  -> it requires a "lib" directory relative to its Main-jar
+        - Slapping everything into one jar:
+          we could probably add sac.jar, flute.jar into our jar 
+          (nothing happening in its manifest)
+		- this would still leave us with commons-compress, jing, saxon.
+          Until I learn how to add their manifests into a unified one.
+          There are tools: http://one-jar.sourceforge.net/, http://code.google.com/p/jarjar/,
+          http://proguard.sourceforge.net/
+          http://maven.apache.org/plugins/maven-assembly-plugin/descriptor-refs.html#jar-with-dependencies
+          http://stackoverflow.com/questions/1059851/is-it-possible-to-package-all-the-jar-dependencies-in-one-big-jar
 	-->
 
 	<property name="build.dir" value="build"/>
