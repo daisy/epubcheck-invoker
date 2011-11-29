@@ -14,17 +14,18 @@
 	<property name="build.prod.dir" value="${build.dir}/prod"/>
 	<property name="build.test.dir" value="${build.dir}/test"/>
 	<property name="classes.dir" location="${build.dir}/classes"/>
+	<property name="build.lib.dir" location="${build.dir}/lib"/>
 	<property name="src.dir" location="src"/>
 	<property name="test.dir" location="test"/>
 	<property name="principal.jar.dir" location="lib"/>
-	<property name="thirdparty.lib.dir" location="thirdpartylibs"/>
+    <property name="thirdparty.lib.dir" location="lib/lib"/>
 	<property name="tmp.dir" location="${build.dir}/tmp"/>
 
-	<property name="app.jar" location="${build.dir}/${ant.project.name}.jar"/>
+	<property name="app.jar" location="${build.lib.dir}/${ant.project.name}.jar"/>
 
 	<target name="prepare">
 		<mkdir dir="${build.dir}"/>
-		<mkdir dir="${build.test.dir}"/>
+        <!-- <mkdir dir="${build.test.dir}"/> -->
 		<mkdir dir="${classes.dir}"/>
 	</target>
 
@@ -91,7 +92,7 @@
 		</unjar>
 	</target>
 
-	<target name="app" depends="compile" description="copy  compiled classes into app.dir">
+	<target name="app" depends="compile, unjar3rdparty" description="copy  compiled classes into app.dir">
 		<copy todir="${tmp.dir}">
 			<fileset dir="${classes.dir}"/>
 		</copy>
@@ -104,6 +105,9 @@
 		            value="org.daisy.validation.epubcheck.EpubcheckBackend"/>
 		    </manifest>
 		</jar>
+		<copy todir="${build.lib.dir}">
+			<fileset dir="${thirdparty.lib.dir}"/>
+		</copy>
 
 
 	    <delete dir="${classes.dir}"/>

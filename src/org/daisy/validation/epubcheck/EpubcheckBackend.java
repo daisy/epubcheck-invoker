@@ -23,7 +23,7 @@ import java.util.zip.ZipFile;
 // TODO: possibly add accessors for Error fields and make them private.
 
 public class EpubcheckBackend {
-	private static final String EPUBCHECK_JAR = "lib/epubcheck-3.0b3.jar";
+	private static final String EPUBCHECK_JAR = "lib/epubcheckbackend.jar";
 
 	public static class Issue {
 		public final String type;
@@ -98,9 +98,16 @@ public class EpubcheckBackend {
 		final Runtime rt = Runtime.getRuntime();
 		Process process;
 		try {
-			final String cmdLine = "java -cp " + EPUBCHECK_JAR
-					+ " com.adobe.epubcheck.tool.Checker " + epubFile;
-			// System.err.println("cmdLine:<"+cmdLine+">");
+
+			final String[] jars = new String[] { "commons-compress-1.2.jar",
+					"flute.jar", "jing.jar", "sac.jar", "saxon9he.jar" };
+
+			final String thirdPartyJars = join(jars, "lib");
+
+			final String cmdLine = "java -cp " + EPUBCHECK_JAR + ":"
+					+ thirdPartyJars + " com.adobe.epubcheck.tool.Checker "
+					+ epubFile;
+			// System.err.println("cmdLine:<" + cmdLine + ">");
 			process = rt.exec(cmdLine);
 		} catch (final IOException e) {
 			throw new RuntimeException(e);
@@ -163,6 +170,20 @@ public class EpubcheckBackend {
 			throw new RuntimeException(e);
 		}
 		return issues;
+	}
+
+	private static String join(final String[] jars, final String path) {
+		final StringBuilder thirdPartySb = new StringBuilder();
+		for (final String jar : jars) {
+			if (path != null & path.length() > 0) {
+				thirdPartySb.append(path);
+				thirdPartySb.append("/");
+			}
+			thirdPartySb.append(jar);
+			thirdPartySb.append(":");
+		}
+		thirdPartySb.setLength(thirdPartySb.length() - 1);
+		return thirdPartySb.toString();
 	}
 
 	/**
