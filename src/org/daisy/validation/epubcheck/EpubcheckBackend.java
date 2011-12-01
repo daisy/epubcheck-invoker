@@ -54,8 +54,109 @@ public class EpubcheckBackend {
 		}
 	}
 
+	private static class ErrorParser {
+		private State currentState;
+
+		public ErrorParser(final String theEpubfile) {
+			normalState = new NormalState(theEpubfile);
+			currentState = normalState;
+		}
+
+		public List<Issue> getIssues() {
+			return normalState.getIssues();
+		}
+
+		public void processLine(final String line) {
+			currentState.processLine(line);
+		}
+
+		public void setCurrentState(State theCurrentState) {
+			currentState = theCurrentState;
+		}
+
+		private final NormalState normalState;
+
+		private final State fnfState = new FileNotFoundState();
+
+		private final State confErrorState = new ConfError();
+
+		private interface State {
+			/**
+			 * Processes a line
+			 * 
+			 * @param line
+			 */
+			public void processLine(final String line);
+		}
+
+		private class NormalState implements State {
+
+			public List<Issue> getIssues() {
+				return issues;
+			}
+
+			private final String epubFile;
+			private final String[] entries;
+			private final List<Issue> issues = new ArrayList<Issue>();
+
+			public NormalState(final String theEpubFile) {
+				epubFile = theEpubFile;
+				entries = EpubcheckBackend.getEntriesInEpub(theEpubFile);
+			}
+
+			@Override
+			public void processLine(final String line) {
+				final Issue issue;
+				if (line.matches(".*File .* does not exist!.*")) {
+					final String file = line.replaceAll(
+							".*File (.*) does not exist!.*", "$1");
+					issues.add(new Issue("Exception", file, line));
+					setCurrentState(fnfState);
+				}
+				else if (line.matches(".*java.lang.NoClassDefFoundError: .*")) {
+					setCurrentState(confErrorState);
+				}
+				else if (line.length() == 0
+						|| line.matches("Check finished with warnings or errors!")) {
+					// skipping
+				}
+				else if ((issue = generateIssue(line, epubFile, entries)) != null) {
+					issues.add(issue);
+				}
+				else {
+					System.err.println("unexpected output on stderr:<" + line
+							+ ">");
+				}
+			}
+		}
+
+		private class FileNotFoundState implements State {
+
+			@Override
+			public void processLine(final String line) {
+				if (!line.matches("^\\s+.*")) {
+					setCurrentState(normalState);
+				}
+			}
+		}
+
+		private class ConfError implements State {
+
+			@Override
+			public void processLine(final String line) {
+				if (!line.matches("^\\s+.*") && !line.matches("^Caused by:.*")) {
+					setCurrentState(normalState);
+				}
+			}
+		}
+	}
+
 	/**
 	 * Retrieves entries in the given epub.
+	 * TODO: Is only used by NormalState and I would like to move it there. But
+	 * then I don't know how to test it, since NormalState isn't needed
+	 * elsewhere than within the private ErrorParser thus should remain private
+	 * itself.
 	 * 
 	 * @param epubFilename
 	 *            the name of the epub to get the entries for.
@@ -91,7 +192,6 @@ public class EpubcheckBackend {
 	 * @throws IOException
 	 */
 	public static List<Issue> run(final String epubFile) {
-		final List<Issue> issues = new ArrayList<Issue>();
 
 		final Runtime rt = Runtime.getRuntime();
 		Process process;
@@ -100,9 +200,9 @@ public class EpubcheckBackend {
 			// It's really ugly, but we're lumping together the class path
 			// for both development environment (IDE) and production.
 			// They're different, because we simplify the deployment of
-			// the jars in one directory, but in the IDE we keep them in
-			// separate directories (to keep track of what's epubcheck and
-			// what's their third party libs.
+			// the jars by keeping them in one directory, but in the IDE we keep
+			// them in separate directories (to keep track of what's epubcheck
+			// and what's their third party libs.
 			final String[] jarNames = new String[] {
 					"commons-compress-1.2.jar", "flute.jar", "jing.jar",
 					"sac.jar", "saxon9he.jar", EPUBCHECK_JAR_PRODUCTION };
@@ -119,76 +219,52 @@ public class EpubcheckBackend {
 			throw new RuntimeException(e);
 		}
 
-		final DataPump errCapture = new DataPump(process.getErrorStream());
-		new FutureTask<Object>(errCapture, null).run();
-		final DataPump outCapture = new DataPump(process.getInputStream());
-		new FutureTask<Object>(outCapture, null).run();
+		final ErrorParser errorParser = new ErrorParser(epubFile);
+
+		processStderr(process, errorParser);
+
+		processStdout(process);
+
+		// sync threads
 		try {
 			process.waitFor();
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			// ignore
 		}
 
-		// TODO:
-		// pass a callback to the task and let it do the parsing
-		// instead of collecting all the output, split the lines and then parse
-		// them!
-		final String stdout = outCapture.getOutput();
-		final String[] stdouts = stdout.split("\n");
-		checkStdout(stdouts);
-		final String stderr = errCapture.getOutput();
-		final String[] stderrs = stderr.split("\n");
+		return errorParser.getIssues();
+	}
 
-		final String[] entries = getEntriesInEpub(epubFile);
+	private static void processStderr(final Process process,
+			final ErrorParser errorParser) {
+		final DataPump stderrProcessor = new DataPump(process.getErrorStream(),
+				new LineProcessor() {
+					@Override
+					public void process(final String line) {
+						errorParser.processLine(line);
+					}
+				});
+		new FutureTask<Object>(stderrProcessor, null).run();
+	}
 
-		Issue issue;
-		int i = 0;
-		while (i < stderrs.length) {
-			// System.out.println("line:<"+line+">");
-			if (stderrs[i].matches(".*File .* does not exist!.*")) {
-				String file = stderrs[i].replaceAll(
-						".*File (.*) does not exist!.*", "$1");
-				issues.add(new Issue("Exception", file, stderrs[i]));
-				++i;
-				while ((i < stderrs.length) && stderrs[i++].matches("^\\s+.*")) {
-					// read on while output is indented
-					// because it's still part of the same error.
-				}
-			}
-			else if (stderrs[i].matches(".*java.lang.NoClassDefFoundError: .*")) {
-				final String ERROR_MSG = "\"lib\" directory required in cwd containing: 1) "
-						+ new File(EPUBCHECK_JAR_PRODUCTION).getName()
-						+ " and 2) \"lib\" directory, containing: commons-compress-1.2.jar, flute.jar, jing.jar, sac.jar, saxon9he.jar.";
-				System.err.println();
-				System.err.println(ERROR_MSG);
-				System.err.println();
-				issues.add(new Issue("EpubcheckBackend Configuration Error",
-						"", ERROR_MSG));
-				System.out.println("original error:" + stderrs[i]);
-				++i;
-				String line;
-				while ((line = stderrs[i++]) != null
-						&& (line.matches("^\\s+.*") || line
-								.matches("^Caused by:.*"))) {
-					// read on while output is indented
-					// because it's still part of the same error.
-				}
-			}
-			else if ((issue = generateIssue(stderrs[i], epubFile, entries)) != null) {
-				issues.add(issue);
-			}
-			else if (stderrs[i]
-					.matches("Check finished with warnings or errors!")
-					|| stderrs[i].length() == 0) {
-				// skipping
-			}
-			else {
-				System.err.println("unexpected output on stderr:<" + stderrs[i]
-						+ ">");
-			}
-			++i;
-		}
-		return issues;
+	private static void processStdout(final Process theProcess) {
+		final DataPump stdoutProcessor = new DataPump(
+				theProcess.getInputStream(), new LineProcessor() {
+					private final String[] expected = new String[] {
+							"Epubcheck Version ", "",
+							"No errors or warnings detected." };
+					private int i = 0;
+
+					@Override
+					public void process(final String line) {
+						if (!line.startsWith(expected[i])) {
+							System.err.println("Unexpected stdtout:<" + line
+									+ "> on line " + (i + 1));
+						}
+						++i;
+					}
+				});
+		new FutureTask<Object>(stdoutProcessor, null).run();
 	}
 
 	private static String join(final String[] jars, final String path) {
@@ -209,6 +285,10 @@ public class EpubcheckBackend {
 	 * Generates an issue from the given epubcheck output line, epubfilename,
 	 * and entries of the epub.
 	 * Returns null if the given line appears not to be an epubcheck issue.
+	 * TODO: Is only used by NormalState and I would like to move it there. But
+	 * then I don't know how to test it, since NormalState isn't needed
+	 * elsewhere than within the private ErrorParser thus should remain private
+	 * itself.
 	 * 
 	 * @param line
 	 *            epubcheck output line
@@ -292,29 +372,7 @@ public class EpubcheckBackend {
 		return lineNo;
 	}
 
-	/**
-	 * Checks whether the output on stdout given by epubcheck complies with our
-	 * expectation.
-	 * 
-	 * @param process
-	 *            The process running epubcheck.
-	 * @throws IOException
-	 */
-	private static void checkStdout(final String[] stdouts) {
-
-		final String[] expected = new String[] { "Epubcheck Version ", "",
-				"No errors or warnings detected." };
-		int i = 0;
-		while (i < stdouts.length && i < expected.length) {
-			if (!stdouts[i].startsWith(expected[i])) {
-				System.err.println("Unexpected stdtout:<" + stdouts[i]
-						+ "> on line " + (i + 1));
-			}
-			i++;
-		}
-	}
-
-	public static void main(String[] args) throws IOException {
+	public static void main(final String[] args) throws IOException {
 		if (args.length != 1) {
 			System.err.println("\nPlease provide one epub filename\n");
 			System.exit(1);

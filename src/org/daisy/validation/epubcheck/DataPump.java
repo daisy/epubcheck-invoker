@@ -5,14 +5,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-class DataPump implements Runnable {
+public class DataPump implements Runnable {
 
 	/**
 	 * Source of data stream
 	 */
 	private final InputStream in;
 
-	private String output;
+	private final LineProcessor lineProcessor;
 
 	/**
 	 * Connect pump from an Input Stream to a String Buffer
@@ -22,8 +22,10 @@ class DataPump implements Runnable {
 	 * @param buffer
 	 *            Data Buffer (holding pond)
 	 */
-	public DataPump(final InputStream dataSource) {
-		this.in = dataSource;
+	public DataPump(final InputStream dataSource,
+			final LineProcessor theLineProcessor) {
+		in = dataSource;
+		lineProcessor = theLineProcessor;
 	}
 
 	/**
@@ -31,54 +33,38 @@ class DataPump implements Runnable {
 	 */
 	public void run() {
 		try {
-			output = DataPump.pump(in);
+			pump(in);
 		} catch (IOException ex) {
 			ex.printStackTrace(System.err);
 		}
 	}
 
 	/**
-	 * This pump extracts text from an input stream into a String.
+	 * Extracts text line by line from an input stream into a
+	 * LineProcessor.
 	 * 
 	 * @param in
 	 *            Data Source
-	 * @param buffer
-	 *            Holding Buffer
-	 * 
-	 * @return the string containing output of InputStream in
-	 * 
 	 * @throws IOException
 	 *             if read/write fails
 	 */
-	/**
-	 * @param in
-	 * @return
-	 * @throws IOException
-	 */
-	private static String pump(final InputStream in) throws IOException {
-		final StringBuilder sb = new StringBuilder();
+	private void pump(final InputStream in) throws IOException {
 		final BufferedReader bReader = new BufferedReader(
 				new InputStreamReader(in));
 		try {
-			final int bucketSize = 1024;
-			final char[] bucket = new char[bucketSize];
-			int drawn;
-			while ((drawn = bReader.read(bucket)) >= 0) {
-				sb.append(bucket, 0, drawn);
+			String line;
+			while ((line = bReader.readLine()) != null) {
+				lineProcessor.process(line);
 			}
 		} finally {
 			if (bReader != null) {
 				bReader.close();
 			}
 		}
-		return sb.toString();
 	}
 
-	/**
-	 * @return the output
-	 */
-	public String getOutput() {
-		return output;
-	}
+}
 
+interface LineProcessor {
+	public void process(final String line);
 }
