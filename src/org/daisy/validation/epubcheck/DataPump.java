@@ -29,37 +29,26 @@ public class DataPump implements Runnable {
 	}
 
 	/**
-	 * Connectors are in place. Begin moving data.
-	 */
-	public void run() {
-		try {
-			pump(in);
-		} catch (IOException ex) {
-			ex.printStackTrace(System.err);
-		}
-	}
-
-	/**
 	 * Extracts text line by line from an input stream into a
 	 * LineProcessor.
 	 * 
-	 * @param in
-	 *            Data Source
-	 * @throws IOException
-	 *             if read/write fails
 	 */
-	private void pump(final InputStream in) throws IOException {
-		final BufferedReader bReader = new BufferedReader(
-				new InputStreamReader(in));
+	public void run() {
 		try {
-			String line;
-			while ((line = bReader.readLine()) != null) {
-				lineProcessor.process(line);
+			final BufferedReader bReader = new BufferedReader(
+					new InputStreamReader(in));
+			try {
+				String line;
+				while ((line = bReader.readLine()) != null) {
+					lineProcessor.process(line);
+				}
+			} finally {
+				if (bReader != null) {
+					bReader.close();
+				}
 			}
-		} finally {
-			if (bReader != null) {
-				bReader.close();
-			}
+		} catch (final IOException ex) {
+			ex.printStackTrace(System.err);
 		}
 	}
 
