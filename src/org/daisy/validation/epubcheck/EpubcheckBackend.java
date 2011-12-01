@@ -1,29 +1,27 @@
 package org.daisy.validation.epubcheck;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.concurrent.FutureTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-// TODO: find out why checkStdout hangs on Moby Dick
 // TODO: add build.xml that builds jar, tests.
 // TODO: possibly add epubcheck-jar to our jar.
 //       Then start the external pgm like this:
 //       java -cp ourjar com.adobe.epubcheck.tool.Checker
 //       But: At least saxon.jar is difficult to distribute in a repackaged jar.
-//       It generates security errors.
 // TODO: get the path to the epubcheck.jar relative to "play" fwk
 // TODO: possibly add accessors for Error fields and make them private.
 
 public class EpubcheckBackend {
-	private static final String EPUBCHECK_JAR = "lib/epubcheckbackend.jar";
+	private static final String EPUBCHECK_JAR_PRODUCTION = "epubcheckbackend.jar";
+	private static final String EPUBCHECK_JAR_IDE = "lib/epubcheck-3.0b3.jar";
 
 	public static class Issue {
 		public final String type;
@@ -99,91 +97,112 @@ public class EpubcheckBackend {
 		Process process;
 		try {
 
-			final String[] jars = new String[] { "commons-compress-1.2.jar",
-					"flute.jar", "jing.jar", "sac.jar", "saxon9he.jar" };
+			// It's really ugly, but we're lumping together the class path
+			// for both development environment (IDE) and production.
+			// They're different, because we simplify the deployment of
+			// the jars in one directory, but in the IDE we keep them in
+			// separate directories (to keep track of what's epubcheck and
+			// what's their third party libs.
+			final String[] jarNames = new String[] {
+					"commons-compress-1.2.jar", "flute.jar", "jing.jar",
+					"sac.jar", "saxon9he.jar", EPUBCHECK_JAR_PRODUCTION };
 
-			final String thirdPartyJars = join(jars, "lib");
+			final String jarsInProduction = join(jarNames, "lib");
+			final String jarsInIDE = join(jarNames, "lib/lib");
 
-			final String cmdLine = "java -cp " + EPUBCHECK_JAR + ":"
-					+ thirdPartyJars + " com.adobe.epubcheck.tool.Checker "
-					+ epubFile;
+			final String cmdLine = "java -cp " + jarsInProduction + ":"
+					+ jarsInIDE + ":" + EPUBCHECK_JAR_IDE
+					+ " com.adobe.epubcheck.tool.Checker " + epubFile;
 			// System.err.println("cmdLine:<" + cmdLine + ">");
 			process = rt.exec(cmdLine);
 		} catch (final IOException e) {
 			throw new RuntimeException(e);
 		}
 
-		// hangs on Moby Dick. Why? Only on my mac! On Ubuntu it works...
-		// checkStdout(process);
+		final DataPump errCapture = new DataPump(process.getErrorStream());
+		new FutureTask<Object>(errCapture, null).run();
+		final DataPump outCapture = new DataPump(process.getInputStream());
+		new FutureTask<Object>(outCapture, null).run();
+		try {
+			process.waitFor();
+		} catch (InterruptedException e) {
+			// ignore
+		}
+
+		// TODO:
+		// pass a callback to the task and let it do the parsing
+		// instead of collecting all the output, split the lines and then parse
+		// them!
+		final String stdout = outCapture.getOutput();
+		final String[] stdouts = stdout.split("\n");
+		checkStdout(stdouts);
+		final String stderr = errCapture.getOutput();
+		final String[] stderrs = stderr.split("\n");
 
 		final String[] entries = getEntriesInEpub(epubFile);
 
-		final BufferedReader bre = new BufferedReader(new InputStreamReader(
-				process.getErrorStream()));
-		try {
-			String line;
-			Issue issue;
-			while ((line = bre.readLine()) != null) {
-				// System.out.println("line:<"+line+">");
-				if (line.matches(".*File .* does not exist!.*")) {
-					String file = line.replaceAll(
-							".*File (.*) does not exist!.*", "$1");
-					issues.add(new Issue("Exception", file, line));
-					while ((line = bre.readLine()) != null
-							&& line.matches("^\\s+.*")) {
-						// read on while output is indented
-						// because it's still part of the same error.
-					}
-				}
-				else if (line.matches(".*java.lang.NoClassDefFoundError: .*")) {
-					final String ERROR_MSG = "\"lib\" directory required in cwd containing: 1) "
-							+ new File(EPUBCHECK_JAR).getName()
-							+ " and 2) \"lib\" directory, containing: commons-compress-1.2.jar, flute.jar, jing.jar, sac.jar, saxon9he.jar.";
-					System.err.println();
-					System.err.println(ERROR_MSG);
-					System.err.println();
-					issues.add(new Issue(
-							"EpubcheckBackend Configuration Error", "",
-							ERROR_MSG));
-					System.out.println("original error:" + line);
-					while ((line = bre.readLine()) != null
-							&& (line.matches("^\\s+.*") || line
-									.matches("^Caused by:.*"))) {
-						// read on while output is indented
-						// because it's still part of the same error.
-					}
-				}
-				else if ((issue = generateIssue(line, epubFile, entries)) != null) {
-					issues.add(issue);
-				}
-				else if (line
-						.matches("Check finished with warnings or errors!")
-						|| line.length() == 0) {
-					// skipping
-				}
-				else {
-					System.out.println("unexpected output on stderr:<" + line
-							+ ">");
+		Issue issue;
+		int i = 0;
+		while (i < stderrs.length) {
+			// System.out.println("line:<"+line+">");
+			if (stderrs[i].matches(".*File .* does not exist!.*")) {
+				String file = stderrs[i].replaceAll(
+						".*File (.*) does not exist!.*", "$1");
+				issues.add(new Issue("Exception", file, stderrs[i]));
+				++i;
+				while ((i < stderrs.length) && stderrs[i++].matches("^\\s+.*")) {
+					// read on while output is indented
+					// because it's still part of the same error.
 				}
 			}
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+			else if (stderrs[i].matches(".*java.lang.NoClassDefFoundError: .*")) {
+				final String ERROR_MSG = "\"lib\" directory required in cwd containing: 1) "
+						+ new File(EPUBCHECK_JAR_PRODUCTION).getName()
+						+ " and 2) \"lib\" directory, containing: commons-compress-1.2.jar, flute.jar, jing.jar, sac.jar, saxon9he.jar.";
+				System.err.println();
+				System.err.println(ERROR_MSG);
+				System.err.println();
+				issues.add(new Issue("EpubcheckBackend Configuration Error",
+						"", ERROR_MSG));
+				System.out.println("original error:" + stderrs[i]);
+				++i;
+				String line;
+				while ((line = stderrs[i++]) != null
+						&& (line.matches("^\\s+.*") || line
+								.matches("^Caused by:.*"))) {
+					// read on while output is indented
+					// because it's still part of the same error.
+				}
+			}
+			else if ((issue = generateIssue(stderrs[i], epubFile, entries)) != null) {
+				issues.add(issue);
+			}
+			else if (stderrs[i]
+					.matches("Check finished with warnings or errors!")
+					|| stderrs[i].length() == 0) {
+				// skipping
+			}
+			else {
+				System.err.println("unexpected output on stderr:<" + stderrs[i]
+						+ ">");
+			}
+			++i;
 		}
 		return issues;
 	}
 
 	private static String join(final String[] jars, final String path) {
-		final StringBuilder thirdPartySb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		for (final String jar : jars) {
 			if (path != null & path.length() > 0) {
-				thirdPartySb.append(path);
-				thirdPartySb.append("/");
+				sb.append(path);
+				sb.append("/");
 			}
-			thirdPartySb.append(jar);
-			thirdPartySb.append(":");
+			sb.append(jar);
+			sb.append(":");
 		}
-		thirdPartySb.setLength(thirdPartySb.length() - 1);
-		return thirdPartySb.toString();
+		sb.setLength(sb.length() - 1);
+		return sb.toString();
 	}
 
 	/**
@@ -281,27 +300,17 @@ public class EpubcheckBackend {
 	 *            The process running epubcheck.
 	 * @throws IOException
 	 */
-	private static void checkStdout(final Process process) {
+	private static void checkStdout(final String[] stdouts) {
 
-		final BufferedReader bri = new BufferedReader(new InputStreamReader(
-				process.getInputStream()));
-
-		String line;
 		final String[] expected = new String[] { "Epubcheck Version ", "",
 				"No errors or warnings detected." };
 		int i = 0;
-		try {
-			while ((line = bri.readLine()) != null) {
-				if (!line.startsWith(expected[i])) {
-					System.err.println("Unexpected stdtout:<" + line
-							+ "> on line " + (i + 1));
-				}
-				i++;
+		while (i < stdouts.length && i < expected.length) {
+			if (!stdouts[i].startsWith(expected[i])) {
+				System.err.println("Unexpected stdtout:<" + stdouts[i]
+						+ "> on line " + (i + 1));
 			}
-		} catch (IOException e) {
-			System.err
-					.println("an error occurred checking stdout, but we'll continue anyway ...");
-			e.printStackTrace(System.err);
+			i++;
 		}
 	}
 
