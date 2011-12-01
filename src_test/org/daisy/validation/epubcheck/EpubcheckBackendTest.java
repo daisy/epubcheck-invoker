@@ -65,7 +65,7 @@ public class EpubcheckBackendTest {
 	@Test
 	public void testError(){
 		final String msg = "ERROR: resources/Issue21.epub/OEBPS/content.opf(9,12): date value '' is not valid as per http://www.w3.org/TR/NOTE-datetime:zero-length string";
-		final EpubcheckBackend.Issue issue = EpubcheckBackend.generateIssue(msg, "resources/Issue21.epub", null);
+		final EpubcheckBackend.Issue issue = ErrorParser.generateIssue(msg, "resources/Issue21.epub", null);
 		assertEquals("ERROR", issue.type);
 		assertEquals("resources/Issue21.epub/OEBPS/content.opf", issue.file);
 		assertEquals("date value '' is not valid as per http://www.w3.org/TR/NOTE-datetime:zero-length string", issue.txt);
@@ -320,6 +320,6 @@ public class EpubcheckBackendTest {
 	
 	@Test
 	public void testGetPathToEpubRoot() throws IOException{
-		EpubcheckBackend.getEntriesInEpub("resources/Issue25.epub");
+		ErrorParser.getEntriesInEpub("resources/Issue25.epub");
 	}
 }
