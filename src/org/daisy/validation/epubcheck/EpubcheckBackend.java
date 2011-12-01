@@ -65,7 +65,7 @@ public class EpubcheckBackend {
 			// They're different, because we simplify the deployment of
 			// the jars by keeping them in one directory, but in the IDE we keep
 			// them in separate directories (to keep track of what's epubcheck
-			// and what's their third party libs.
+			// and what's their third party libs.)
 			final String[] jarNames = new String[] {
 					"commons-compress-1.2.jar", "flute.jar", "jing.jar",
 					"sac.jar", "saxon9he.jar", EPUBCHECK_JAR_PRODUCTION };
