@@ -39,7 +39,7 @@ class ErrorParser {
 		currentState.processLine(line);
 	}
 
-	void setCurrentState(State theCurrentState) {
+	void setCurrentState(final State theCurrentState) {
 		currentState = theCurrentState;
 	}
 
