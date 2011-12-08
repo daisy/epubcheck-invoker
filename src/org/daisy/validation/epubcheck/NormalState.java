@@ -1,6 +1,5 @@
 package org.daisy.validation.epubcheck;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -247,8 +246,6 @@ class NormalState implements ErrorParser.State {
 		String file = matcher.group(i++);
 		if (entries != null && entries.length > 0) {
 			file = normalizeFilename(entries, file);
-			file = new File(theEpubFilename).getName()
-					+ (file != null && file.length() > 0 ? "/" + file : "");
 		}
 
 		final String lineNoStr = matcher.group(i++);

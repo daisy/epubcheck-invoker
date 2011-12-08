@@ -47,7 +47,7 @@ public class EpubcheckBackendTest {
 		assertEquals(1, issues.size());
 		final EpubcheckBackend.Issue issue = issues.get(0);
 		assertEquals("WARNING", issue.type);
-		assertEquals("EmptyDir.epub", issue.file);
+		assertEquals("", issue.file);
 		assertEquals("zip file contains empty directory emptyDir/", issue.txt);
 	}
 
@@ -66,14 +66,14 @@ public class EpubcheckBackendTest {
 		int i = 0;
 		EpubcheckBackend.Issue issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
-		assertEquals("Issue21.epub/OEBPS/content.opf", issue.file);
+		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(
 				"date value '' is not valid as per http://www.w3.org/TR/NOTE-datetime:zero-length string",
 				issue.txt);
 
 		issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
-		assertEquals("Issue21.epub/OEBPS/content.opf", issue.file);
+		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(
 				"toc attribute references resource with non-NCX mime type; \"application/x-dtbncx+xml\" is expected",
 				issue.txt);
@@ -102,7 +102,7 @@ public class EpubcheckBackendTest {
 
 		EpubcheckBackend.Issue issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
-		assertEquals("Issue25.epub/mimetype", issue.file);
+		assertEquals("mimetype", issue.file);
 		assertEquals(-1, issue.lineNo);
 		assertEquals(-1, issue.colNo);
 		assertEquals(
@@ -111,7 +111,7 @@ public class EpubcheckBackendTest {
 
 		issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
-		assertEquals("Issue25.epub/OEBPS/content.opf", issue.file);
+		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(35, issue.lineNo);
 		assertEquals(9, issue.colNo);
 		assertEquals("element \"spine\" missing required attribute \"toc\"",
@@ -119,7 +119,7 @@ public class EpubcheckBackendTest {
 
 		issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
-		assertEquals("Issue25.epub/OEBPS/title_page.html", issue.file);
+		assertEquals("OEBPS/title_page.html", issue.file);
 		assertEquals(-1, issue.lineNo);
 		assertEquals(-1, issue.colNo);
 		assertEquals(
@@ -128,7 +128,7 @@ public class EpubcheckBackendTest {
 
 		issue = issues.get(i++);
 		assertEquals("WARNING", issue.type);
-		assertEquals("Issue25.epub", issue.file);
+		assertEquals("", issue.file);
 		assertEquals(-1, issue.lineNo);
 		assertEquals(-1, issue.colNo);
 		assertEquals(
@@ -137,7 +137,7 @@ public class EpubcheckBackendTest {
 
 		issue = issues.get(i++);
 		assertEquals("WARNING", issue.type);
-		assertEquals("Issue25.epub", issue.file);
+		assertEquals("", issue.file);
 		assertEquals(-1, issue.lineNo);
 		assertEquals(-1, issue.colNo);
 		assertEquals(
@@ -146,7 +146,7 @@ public class EpubcheckBackendTest {
 
 		issue = issues.get(i++);
 		assertEquals("WARNING", issue.type);
-		assertEquals("Issue25.epub", issue.file);
+		assertEquals("", issue.file);
 		assertEquals(-1, issue.lineNo);
 		assertEquals(-1, issue.colNo);
 		assertEquals(
@@ -155,7 +155,7 @@ public class EpubcheckBackendTest {
 
 		issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
-		assertEquals("Issue25.epub/OEBPS/title_page.html", issue.file);
+		assertEquals("OEBPS/title_page.html", issue.file);
 		assertEquals(7, issue.lineNo);
 		assertEquals(64, issue.colNo);
 		assertEquals(
@@ -164,7 +164,7 @@ public class EpubcheckBackendTest {
 
 		issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
-		assertEquals("Issue25.epub/OEBPS/chapter01.html", issue.file);
+		assertEquals("OEBPS/chapter01.html", issue.file);
 		assertEquals(9, issue.lineNo);
 		assertEquals(100, issue.colNo);
 		assertEquals(
@@ -180,7 +180,7 @@ public class EpubcheckBackendTest {
 		assertEquals(1, issues.size());
 		final EpubcheckBackend.Issue issue = issues.get(0);
 		assertEquals("ERROR", issue.type);
-		assertEquals("Issue95.epub/META-INF/container.xml", issue.file);
+		assertEquals("META-INF/container.xml", issue.file);
 		assertEquals(-1, issue.lineNo);
 		assertEquals(-1, issue.colNo);
 		assertEquals(
@@ -210,7 +210,7 @@ public class EpubcheckBackendTest {
 		final EpubcheckBackend.Issue issue = issues.get(0);
 		assertEquals(1, issues.size());
 		assertEquals("ERROR", issue.type);
-		assertEquals("Non8601Date.epub/OEBPS/content.opf", issue.file);
+		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(10, issue.lineNo);
 		assertEquals(35, issue.colNo);
 		assertEquals(
@@ -226,7 +226,7 @@ public class EpubcheckBackendTest {
 		final EpubcheckBackend.Issue issue = issues.get(0);
 		assertEquals(1, issues.size());
 		assertEquals("ERROR", issue.type);
-		assertEquals("NullDate.epub/OEBPS/content.opf", issue.file);
+		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(10, issue.lineNo);
 		assertEquals(23, issue.colNo);
 		assertEquals(
@@ -244,8 +244,7 @@ public class EpubcheckBackendTest {
 
 		EpubcheckBackend.Issue issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
-		assertEquals("OPFIllegalElement_UniqueID.epub/OEBPS/content.opf",
-				issue.file);
+		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(2, issue.lineNo);
 		assertEquals(9, issue.colNo);
 		assertEquals(
@@ -254,8 +253,7 @@ public class EpubcheckBackendTest {
 
 		issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
-		assertEquals("OPFIllegalElement_UniqueID.epub/OEBPS/content.opf",
-				issue.file);
+		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(-1, issue.lineNo);
 		assertEquals(-1, issue.colNo);
 		assertEquals(
@@ -272,7 +270,7 @@ public class EpubcheckBackendTest {
 
 		final EpubcheckBackend.Issue issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
-		assertEquals("OPFIllegalElement.epub/OEBPS/content.opf", issue.file);
+		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(2, issue.lineNo);
 		assertEquals(8, issue.colNo);
 		assertEquals(
@@ -291,7 +289,7 @@ public class EpubcheckBackendTest {
 
 		final EpubcheckBackend.Issue issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
-		assertEquals("PageMap.epub/OEBPS/content.opf", issue.file);
+		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(26, issue.lineNo);
 		assertEquals(33, issue.colNo);
 		assertEquals(
@@ -318,7 +316,7 @@ public class EpubcheckBackendTest {
 
 		EpubcheckBackend.Issue issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
-		assertEquals("UniqueIDNotUsed.epub/OEBPS/content.opf", issue.file);
+		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(9, issue.lineNo);
 		assertEquals(12, issue.colNo);
 		assertEquals(
@@ -327,7 +325,7 @@ public class EpubcheckBackendTest {
 
 		issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
-		assertEquals("UniqueIDNotUsed.epub/OEBPS/content.opf", issue.file);
+		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(-1, issue.lineNo);
 		assertEquals(-1, issue.colNo);
 		assertEquals(
@@ -346,7 +344,7 @@ public class EpubcheckBackendTest {
 
 		EpubcheckBackend.Issue issue = issues.get(i++);
 		assertEquals("WARNING", issue.type);
-		assertEquals("Unmanifested.epub", issue.file);
+		assertEquals("", issue.file);
 		assertEquals(-1, issue.lineNo);
 		assertEquals(-1, issue.colNo);
 		assertEquals(
@@ -355,7 +353,7 @@ public class EpubcheckBackendTest {
 
 		issue = issues.get(i++);
 		assertEquals("WARNING", issue.type);
-		assertEquals("Unmanifested.epub", issue.file);
+		assertEquals("", issue.file);
 		assertEquals(-1, issue.lineNo);
 		assertEquals(-1, issue.colNo);
 		assertEquals(
@@ -374,8 +372,7 @@ public class EpubcheckBackendTest {
 
 		EpubcheckBackend.Issue issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
-		assertEquals("UnmanifestedGuideItems.epub/OEBPS/content.opf",
-				issue.file);
+		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(29, issue.lineNo);
 		assertEquals(67, issue.colNo);
 		assertEquals(
@@ -384,8 +381,7 @@ public class EpubcheckBackendTest {
 
 		issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
-		assertEquals("UnmanifestedGuideItems.epub/OEBPS/content.opf",
-				issue.file);
+		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(29, issue.lineNo);
 		assertEquals(67, issue.colNo);
 		assertEquals(
