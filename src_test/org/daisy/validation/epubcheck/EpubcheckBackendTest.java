@@ -3,6 +3,7 @@ package org.daisy.validation.epubcheck;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -12,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.daisy.validation.epubcheck.EpubcheckBackend.Issue;
+import org.daisy.validation.epubcheck.StdoutStderrSaver.Hook;
 import org.junit.Test;
 
 import com.google.common.base.Splitter;
@@ -23,20 +25,43 @@ public class EpubcheckBackendTest {
 		EpubcheckBackend.run("resources/ContainerNotOPF.epub");
 	}
 
+	private class IssueHook implements Hook {
+		public IssueHook(final String theEpubFile) {
+			epubFile = theEpubFile;
+		}
+
+		public List<EpubcheckBackend.Issue> getIssues() {
+			return issues;
+		}
+
+		@Override
+		public void hook() {
+			issues = EpubcheckBackend.run(epubFile);
+		}
+
+		private List<EpubcheckBackend.Issue> issues;
+		private final String epubFile;
+	}
+
 	/**
 	 * @throws IOException
 	 */
 	@Test
 	public void testEpubcheckFileNotFound() throws IOException {
 		final String epubFile = "xyxyources/ContainerNotOPF.epub";
-		final List<EpubcheckBackend.Issue> issues = EpubcheckBackend
-				.run(epubFile);
+
+		final IssueHook hook = new IssueHook(epubFile);
+		final String[] sysOutsysErr = StdoutStderrSaver.process(hook);
+		final List<EpubcheckBackend.Issue> issues = hook.getIssues();
 		assertEquals(1, issues.size());
 		final EpubcheckBackend.Issue issue = issues.get(0);
 		assertEquals("Exception", issue.type);
 		assertEquals(epubFile, issue.file);
 		assertEquals("java.lang.RuntimeException: File " + epubFile
 				+ " does not exist!", issue.txt);
+		assertEquals(0, sysOutsysErr[0].length());
+		assertTrue(sysOutsysErr[1]
+				.matches("(?s:an error occurred getting entries of epubfile .*)"));
 	}
 
 	@Test
