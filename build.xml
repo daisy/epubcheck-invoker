@@ -25,26 +25,43 @@
 	<property name="src.dir" location="src"/>
 	<property name="test.dir" location="test"/>
 	<property name="principal.jar.dir" location="lib"/>
-    <property name="thirdparty.lib.dir" location="lib/lib"/>
 	<property name="tmp.dir" location="${build.dir}/tmp"/>
 
 	<property name="app.jar" location="${build.lib.dir}/${ant.project.name}.jar"/>
 
+    <presetdef name="my.javac">
+        <javac includeantruntime="false" />
+    </presetdef>
+	
 	<target name="prepare">
 		<mkdir dir="${build.dir}"/>
+		<mkdir dir="${build.lib.dir}"/>
         <!-- <mkdir dir="${build.test.dir}"/> -->
 		<mkdir dir="${classes.dir}"/>
+		
+		
+		<!-- 
+		Note: manifestclasspath must *follow* creation of build.lib.dir!
+		http://ant.apache.org/manual/Tasks/manifestclasspath.html
+		http://stackoverflow.com/questions/858766/generate-manifest-class-path-from-classpath-in-ant
+		Note: Of course this is only of use for the calling of java -jar epubcheckbackend.jar
+		      since only then the Manifest-Entry Class-Path: is heeded!
+		-->
+		<path id="dep.runtime">
+		    <fileset dir="${principal.jar.dir}">
+		        <include name="**/*.jar" />
+		    </fileset>
+		</path>
+		<property name="dep_cp" value="${toString:dep.runtime}" />
+	    <manifestclasspath property="manifest_cp" jarfile="${app.jar}">
+	        <classpath refid="dep.runtime" />
+	    </manifestclasspath>
 	</target>
+
 
 	<target name="clean">
 		<delete dir="${build.dir}"/>
 	</target>
-	
-	<fileset id="thirdparty.jars" dir="${thirdparty.lib.dir}">
-		<patternset>
-			<include name="*.jar"/>
-		</patternset>
-	</fileset>
 	
 	<fileset id="principal.jar" dir="${principal.jar.dir}">
 		<patternset>
@@ -56,16 +73,17 @@
 		<pathelement location="${build.prod.dir}"/>
 		<pathelement location="${build.test.dir}"/>
 		<pathelement location="${classes.dir}"/>
+		<fileset refid="principal.jar"/>
 	</path>
 
 	<target name="compile" depends="prepare">
-		<javac
+		<my.javac
 			srcdir="${src.dir}"
 			destdir="${classes.dir}"
 			deprecation="on"
 			debug="on">
 			<classpath refid="project.classpath"/>
-		</javac>
+		</my.javac>
 	</target>
 
 	<target name="compile-tests" depends="compile">
@@ -99,10 +117,11 @@
 		</unjar>
 	</target>
 
-	<target name="app" depends="compile, unjar3rdparty" description="copy  compiled classes into app.dir">
+	<target name="app" depends="compile" description="copy compiled classes into app.dir">
 		<copy todir="${tmp.dir}">
 			<fileset dir="${classes.dir}"/>
 		</copy>
+		
 
 		<!-- make application jar file -->
 		<jar jarfile="${app.jar}"
@@ -110,12 +129,12 @@
 		    <manifest>
 		      <attribute name="Main-Class"
 		            value="org.daisy.validation.epubcheck.EpubcheckBackend"/>
+		    	<attribute name="Class-Path" value="${manifest_cp}" />
 		    </manifest>
 		</jar>
 		<copy todir="${build.lib.dir}">
-			<fileset dir="${thirdparty.lib.dir}"/>
+			<fileset refid="principal.jar"/>
 		</copy>
-
 
 	    <delete dir="${classes.dir}"/>
 	    <delete dir="${tmp.dir}"/>

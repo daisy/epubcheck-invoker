@@ -4,17 +4,16 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.FutureTask;
 
-// TODO: add build.xml that builds jar, tests.
-// TODO: possibly add epubcheck-jar to our jar.
+// TODO: possibly add epubcheck-3.0b3.jar and its dependencies to our jar.
 //       Then start the external pgm like this:
 //       java -cp ourjar com.adobe.epubcheck.tool.Checker
 //       But: At least saxon.jar is difficult to distribute in a repackaged jar.
-// TODO: get the path to the epubcheck.jar relative to "play" fwk
 // TODO: possibly add accessors for Error fields and make them private.
 
 public class EpubcheckBackend {
-	private static final String EPUBCHECK_JAR_PRODUCTION = "epubcheckbackend.jar";
-	private static final String EPUBCHECK_JAR_IDE = "lib/epubcheck-3.0b3.jar";
+	// NOTE: this jar file's name (excluding the extension .jar) should
+	// correspond to the project name of the build.xml file.
+	private static final String EPUBCHECK_BACKEND_JAR = "epubcheckbackend.jar";
 
 	public static class Issue {
 		public final String type;
@@ -47,6 +46,13 @@ public class EpubcheckBackend {
 		}
 	}
 
+	private static final String[] jarNames = new String[] {
+			"epubcheck-3.0b3.jar", "commons-compress-1.2.jar", "flute.jar",
+			"jing.jar", "sac.jar", "saxon9he.jar", "guava-10.0.1.jar",
+			EPUBCHECK_BACKEND_JAR };
+
+	public static final String JAR_LIST = join(jarNames, ", ");
+
 	/**
 	 * Runs epubcheck on the given epub-File
 	 * 
@@ -60,21 +66,9 @@ public class EpubcheckBackend {
 		Process process;
 		try {
 
-			// It's really ugly, but we're lumping together the class path
-			// for both development environment (IDE) and production.
-			// They're different, because we simplify the deployment of
-			// the jars by keeping them in one directory, but in the IDE we keep
-			// them in separate directories (to keep track of what's epubcheck
-			// and what's their third party libs.)
-			final String[] jarNames = new String[] {
-					"commons-compress-1.2.jar", "flute.jar", "jing.jar",
-					"sac.jar", "saxon9he.jar", EPUBCHECK_JAR_PRODUCTION };
+			final String jars = join(jarNames, ":", "lib");
 
-			final String jarsInProduction = join(jarNames, "lib");
-			final String jarsInIDE = join(jarNames, "lib/lib");
-
-			final String cmdLine = "java -cp " + jarsInProduction + ":"
-					+ jarsInIDE + ":" + EPUBCHECK_JAR_IDE
+			final String cmdLine = "java -cp " + jars + ":"
 					+ " com.adobe.epubcheck.tool.Checker " + epubFile;
 			// System.err.println("cmdLine:<" + cmdLine + ">");
 			process = rt.exec(cmdLine);
@@ -104,6 +98,7 @@ public class EpubcheckBackend {
 				new LineProcessor() {
 					@Override
 					public void process(final String line) {
+						System.out.println("line:" + line);
 						errorParser.processLine(line);
 					}
 				});
@@ -130,15 +125,44 @@ public class EpubcheckBackend {
 		new FutureTask<Object>(stdoutProcessor, null).run();
 	}
 
-	private static String join(final String[] jars, final String path) {
+	/**
+	 * Joins the Strings in array jars using separator sep.
+	 * 
+	 * NOTE: Not using com.google.common.base.Joiner from guava-10.0.1.jar,
+	 * because I add it only to the classpath of the invoked Runtime
+	 * 
+	 * @param jars
+	 *            Strings to join
+	 * @param sep
+	 *            separator to use joining strings
+	 * @return
+	 */
+	private static String join(final String[] jars, final String sep) {
+		return join(jars, sep, null);
+	}
+
+	/**
+	 * Joins the Strings in array jars, optionally prepending each with path,
+	 * using separator sep.
+	 * 
+	 * @param jars
+	 *            Strings to join
+	 * @param sep
+	 *            separator to use joining strings
+	 * @param path
+	 *            to prepend to Strings prior to joining. Not used if null.
+	 * @return
+	 */
+	private static String join(final String[] jars, final String sep,
+			final String path) {
 		final StringBuilder sb = new StringBuilder();
 		for (final String jar : jars) {
-			if (path != null & path.length() > 0) {
+			if (path != null && path.length() > 0) {
 				sb.append(path);
 				sb.append("/");
 			}
 			sb.append(jar);
-			sb.append(":");
+			sb.append(sep);
 		}
 		sb.setLength(sb.length() - 1);
 		return sb.toString();
