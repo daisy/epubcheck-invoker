@@ -98,7 +98,7 @@ public class EpubcheckBackend {
 				new LineProcessor() {
 					@Override
 					public void process(final String line) {
-						System.out.println("line:" + line);
+						// System.out.println("line:" + line);
 						errorParser.processLine(line);
 					}
 				});
