@@ -11,14 +11,10 @@ import java.util.concurrent.FutureTask;
 // TODO: possibly add accessors for Error fields and make them private.
 
 public class EpubcheckBackend {
-	// NOTE: this jar file's name (excluding the extension .jar) should
-	// correspond to the project name of the build.xml file.
-	private static final String EPUBCHECK_BACKEND_JAR = "epubcheckbackend.jar";
 
 	private static final String[] jarNames = new String[] {
 			"epubcheck-3.0b3.jar", "commons-compress-1.2.jar", "flute.jar",
-			"jing.jar", "sac.jar", "saxon9he.jar", "guava-10.0.1.jar",
-			EPUBCHECK_BACKEND_JAR };
+			"jing.jar", "sac.jar", "saxon9he.jar"};
 
 	public static final String JAR_LIST = join(jarNames, ", ");
 
