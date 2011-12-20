@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.daisy.validation.epubcheck.EpubcheckBackend.Issue;
 
 class NormalState implements ErrorParser.State {
 
@@ -234,7 +233,7 @@ class NormalState implements ErrorParser.State {
 	 *            entries of the epub
 	 * @return Issue represented by the given input.
 	 */
-	private static EpubcheckBackend.Issue generateIssue(final String line,
+	private static Issue generateIssue(final String line,
 			final String theEpubFilename, final String[] entries) {
 
 		final String regex = "^(ERROR|WARNING): (.*?)(?:\\((\\d+),(\\d+)\\))?: (.*)";
@@ -259,7 +258,7 @@ class NormalState implements ErrorParser.State {
 		colNo = getLineNo(colNoStr);
 		final String txt = matcher.group(i++);
 
-		final EpubcheckBackend.Issue issue = new EpubcheckBackend.Issue(type,
+		final Issue issue = new Issue(type,
 				file, lineNo, colNo, txt);
 		return issue;
 	}

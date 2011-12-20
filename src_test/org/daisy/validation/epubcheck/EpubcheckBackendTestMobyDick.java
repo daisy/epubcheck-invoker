@@ -21,9 +21,9 @@ public class EpubcheckBackendTestMobyDick {
 	public void testMobyDick() {
 
 		final String epubFile = "resources/9780316000000_MobyDick_r6.epub";
-		final List<EpubcheckBackend.Issue> issues = EpubcheckBackend
+		final List<Issue> issues = EpubcheckBackend
 				.run(epubFile);
-		EpubcheckBackend.Issue issue = null;
+		Issue issue = null;
 		assertEquals(188, issues.size());
 		int i = 0;
 

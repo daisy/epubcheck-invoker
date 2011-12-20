@@ -15,37 +15,6 @@ public class EpubcheckBackend {
 	// correspond to the project name of the build.xml file.
 	private static final String EPUBCHECK_BACKEND_JAR = "epubcheckbackend.jar";
 
-	public static class Issue {
-		public final String type;
-		public final String file;
-		public final int lineNo;
-		public final int colNo;
-		public final String txt;
-
-		public Issue(final String theType, final String theFile,
-				final int theLineNo, final int theColNo, final String theTxt) {
-			type = theType;
-			file = theFile;
-			lineNo = theLineNo;
-			colNo = theColNo;
-			txt = theTxt;
-		}
-
-		public Issue(final String theType, final String theFile,
-				final String theTxt) {
-			this(theType, theFile, -1, -1, theTxt);
-		}
-
-		public String toString() {
-			return "type:'"
-					+ type
-					+ "' file:'"
-					+ file
-					+ (lineNo != -1 ? "' (" + lineNo + "," + colNo + ") " : " ")
-					+ "txt: '" + txt + "'";
-		}
-	}
-
 	private static final String[] jarNames = new String[] {
 			"epubcheck-3.0b3.jar", "commons-compress-1.2.jar", "flute.jar",
 			"jing.jar", "sac.jar", "saxon9he.jar", "guava-10.0.1.jar",

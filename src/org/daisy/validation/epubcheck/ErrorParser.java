@@ -2,7 +2,6 @@ package org.daisy.validation.epubcheck;
 
 import java.util.List;
 
-import org.daisy.validation.epubcheck.EpubcheckBackend.Issue;
 
 class ErrorParser {
 

@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.daisy.validation.epubcheck.EpubcheckBackend.Issue;
 import org.daisy.validation.epubcheck.StdoutStderrSaver.Hook;
 import org.junit.Test;
 
@@ -30,7 +29,7 @@ public class EpubcheckBackendTest {
 			epubFile = theEpubFile;
 		}
 
-		public List<EpubcheckBackend.Issue> getIssues() {
+		public List<Issue> getIssues() {
 			return issues;
 		}
 
@@ -39,7 +38,7 @@ public class EpubcheckBackendTest {
 			issues = EpubcheckBackend.run(epubFile);
 		}
 
-		private List<EpubcheckBackend.Issue> issues;
+		private List<Issue> issues;
 		private final String epubFile;
 	}
 
@@ -52,9 +51,9 @@ public class EpubcheckBackendTest {
 
 		final IssueHook hook = new IssueHook(epubFile);
 		final String[] sysOutsysErr = StdoutStderrSaver.process(hook);
-		final List<EpubcheckBackend.Issue> issues = hook.getIssues();
+		final List<Issue> issues = hook.getIssues();
 		assertEquals(1, issues.size());
-		final EpubcheckBackend.Issue issue = issues.get(0);
+		final Issue issue = issues.get(0);
 		assertEquals("Exception", issue.type);
 		assertEquals(epubFile, issue.file);
 		assertEquals("java.lang.RuntimeException: File " + epubFile
@@ -67,10 +66,10 @@ public class EpubcheckBackendTest {
 	@Test
 	public void testEpubcheckEmptyDir() throws IOException {
 		final String epubFile = "resources/EmptyDir.epub";
-		final List<EpubcheckBackend.Issue> issues = EpubcheckBackend
+		final List<Issue> issues = EpubcheckBackend
 				.run(epubFile);
 		assertEquals(1, issues.size());
-		final EpubcheckBackend.Issue issue = issues.get(0);
+		final Issue issue = issues.get(0);
 		assertEquals("WARNING", issue.type);
 		assertEquals("", issue.file);
 		assertEquals("zip file contains empty directory emptyDir/", issue.txt);
@@ -85,11 +84,11 @@ public class EpubcheckBackendTest {
 	@Test
 	public void testIssue21() throws IOException {
 		final String epubFile = "resources/Issue21.epub";
-		final List<EpubcheckBackend.Issue> issues = EpubcheckBackend
+		final List<Issue> issues = EpubcheckBackend
 				.run(epubFile);
 		assertEquals(2, issues.size());
 		int i = 0;
-		EpubcheckBackend.Issue issue = issues.get(i++);
+		Issue issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(
@@ -108,7 +107,7 @@ public class EpubcheckBackendTest {
 	public void testError() throws IllegalArgumentException,
 			IllegalAccessException, InvocationTargetException {
 		final String msg = "ERROR: resources/Issue21.epub/OEBPS/content.opf(9,12): date value '' is not valid as per http://www.w3.org/TR/NOTE-datetime:zero-length string";
-		final EpubcheckBackend.Issue issue = (Issue) generateIssue.invoke(null,
+		final Issue issue = (Issue) generateIssue.invoke(null,
 				msg, "resources/Issue21.epub", null);
 		assertEquals("ERROR", issue.type);
 		assertEquals("resources/Issue21.epub/OEBPS/content.opf", issue.file);
@@ -120,12 +119,12 @@ public class EpubcheckBackendTest {
 	@Test
 	public void testIssue25() throws IOException {
 		final String epubFile = "resources/Issue25.epub";
-		final List<EpubcheckBackend.Issue> issues = EpubcheckBackend
+		final List<Issue> issues = EpubcheckBackend
 				.run(epubFile);
 		int i = 0;
 		assertEquals(8, issues.size());
 
-		EpubcheckBackend.Issue issue = issues.get(i++);
+		Issue issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
 		assertEquals("mimetype", issue.file);
 		assertEquals(-1, issue.lineNo);
@@ -200,10 +199,10 @@ public class EpubcheckBackendTest {
 	@Test
 	public void testIssue95() throws IOException {
 		final String epubFile = "resources/Issue95.epub";
-		final List<EpubcheckBackend.Issue> issues = EpubcheckBackend
+		final List<Issue> issues = EpubcheckBackend
 				.run(epubFile);
 		assertEquals(1, issues.size());
-		final EpubcheckBackend.Issue issue = issues.get(0);
+		final Issue issue = issues.get(0);
 		assertEquals("ERROR", issue.type);
 		assertEquals("META-INF/container.xml", issue.file);
 		assertEquals(-1, issue.lineNo);
@@ -216,23 +215,23 @@ public class EpubcheckBackendTest {
 	@Test
 	public void testIssueJoyce() throws IOException {
 		final String epubFile = "resources/joyce-a-portrait-of-the-artist-as-a-young-man.epub";
-		List<EpubcheckBackend.Issue> issues = EpubcheckBackend.run(epubFile);
+		List<Issue> issues = EpubcheckBackend.run(epubFile);
 		assertEquals(0, issues.size());
 	}
 
 	@Test
 	public void testIssueMetaInfoNotOPF() throws IOException {
 		final String epubFile = "resources/MetaInfNotOPF.epub";
-		List<EpubcheckBackend.Issue> issues = EpubcheckBackend.run(epubFile);
+		List<Issue> issues = EpubcheckBackend.run(epubFile);
 		assertEquals(0, issues.size());
 	}
 
 	@Test
 	public void testNon8601Date() throws IOException {
 		final String epubFile = "resources/Non8601Date.epub";
-		final List<EpubcheckBackend.Issue> issues = EpubcheckBackend
+		final List<Issue> issues = EpubcheckBackend
 				.run(epubFile);
-		final EpubcheckBackend.Issue issue = issues.get(0);
+		final Issue issue = issues.get(0);
 		assertEquals(1, issues.size());
 		assertEquals("ERROR", issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
@@ -246,9 +245,9 @@ public class EpubcheckBackendTest {
 	@Test
 	public void testNullDate() throws IOException {
 		final String epubFile = "resources/NullDate.epub";
-		final List<EpubcheckBackend.Issue> issues = EpubcheckBackend
+		final List<Issue> issues = EpubcheckBackend
 				.run(epubFile);
-		final EpubcheckBackend.Issue issue = issues.get(0);
+		final Issue issue = issues.get(0);
 		assertEquals(1, issues.size());
 		assertEquals("ERROR", issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
@@ -262,12 +261,12 @@ public class EpubcheckBackendTest {
 	@Test
 	public void testOPFIllegalElement_UniqueID() throws IOException {
 		final String epubFile = "resources/OPFIllegalElement_UniqueID.epub";
-		final List<EpubcheckBackend.Issue> issues = EpubcheckBackend
+		final List<Issue> issues = EpubcheckBackend
 				.run(epubFile);
 		assertEquals(2, issues.size());
 		int i = 0;
 
-		EpubcheckBackend.Issue issue = issues.get(i++);
+		Issue issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(2, issue.lineNo);
@@ -289,11 +288,11 @@ public class EpubcheckBackendTest {
 	@Test
 	public void testOPFIllegalElement() throws IOException {
 		final String epubFile = "resources/OPFIllegalElement.epub";
-		List<EpubcheckBackend.Issue> issues = EpubcheckBackend.run(epubFile);
+		List<Issue> issues = EpubcheckBackend.run(epubFile);
 		assertEquals(1, issues.size());
 		int i = 0;
 
-		final EpubcheckBackend.Issue issue = issues.get(i++);
+		final Issue issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(2, issue.lineNo);
@@ -307,12 +306,12 @@ public class EpubcheckBackendTest {
 	@Test
 	public void testPageMap() throws IOException {
 		final String epubFile = "resources/PageMap.epub";
-		final List<EpubcheckBackend.Issue> issues = EpubcheckBackend
+		final List<Issue> issues = EpubcheckBackend
 				.run(epubFile);
 		assertEquals(1, issues.size());
 		int i = 0;
 
-		final EpubcheckBackend.Issue issue = issues.get(i++);
+		final Issue issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(26, issue.lineNo);
@@ -326,7 +325,7 @@ public class EpubcheckBackendTest {
 	@Test
 	public void testTest() throws IOException {
 		final String epubFile = "resources/Test.epub";
-		final List<EpubcheckBackend.Issue> issues = EpubcheckBackend
+		final List<Issue> issues = EpubcheckBackend
 				.run(epubFile);
 		assertEquals(0, issues.size());
 	}
@@ -334,12 +333,12 @@ public class EpubcheckBackendTest {
 	@Test
 	public void testUniqueIDNotUsed() throws IOException {
 		final String epubFile = "resources/UniqueIDNotUsed.epub";
-		final List<EpubcheckBackend.Issue> issues = EpubcheckBackend
+		final List<Issue> issues = EpubcheckBackend
 				.run(epubFile);
 		assertEquals(2, issues.size());
 		int i = 0;
 
-		EpubcheckBackend.Issue issue = issues.get(i++);
+		Issue issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(9, issue.lineNo);
@@ -362,12 +361,12 @@ public class EpubcheckBackendTest {
 	@Test
 	public void testUnmanifested() throws IOException {
 		final String epubFile = "resources/Unmanifested.epub";
-		final List<EpubcheckBackend.Issue> issues = EpubcheckBackend
+		final List<Issue> issues = EpubcheckBackend
 				.run(epubFile);
 		assertEquals(2, issues.size());
 		int i = 0;
 
-		EpubcheckBackend.Issue issue = issues.get(i++);
+		Issue issue = issues.get(i++);
 		assertEquals("WARNING", issue.type);
 		assertEquals("", issue.file);
 		assertEquals(-1, issue.lineNo);
@@ -390,12 +389,12 @@ public class EpubcheckBackendTest {
 	@Test
 	public void testUnmanifestedGuideItems() throws IOException {
 		final String epubFile = "resources/UnmanifestedGuideItems.epub";
-		final List<EpubcheckBackend.Issue> issues = EpubcheckBackend
+		final List<Issue> issues = EpubcheckBackend
 				.run(epubFile);
 		assertEquals(2, issues.size());
 		int i = 0;
 
-		EpubcheckBackend.Issue issue = issues.get(i++);
+		Issue issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(29, issue.lineNo);
