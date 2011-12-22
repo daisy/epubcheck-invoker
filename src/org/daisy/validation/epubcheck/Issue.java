@@ -17,6 +17,13 @@ public final class Issue {
 				return INTERNAL_ERROR;
 			}
 		}
+
+		@Override
+		public String toString() {
+			return name().replace('_', ' ');
+		}
+		
+		
 	}
 
 	public final Type type;
