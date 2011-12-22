@@ -1,5 +1,0 @@
-# switch to regexp syntax.
-syntax: regexp
-^\.metadata
-^build
-^bin
