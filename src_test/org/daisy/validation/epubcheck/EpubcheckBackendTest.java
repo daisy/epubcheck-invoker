@@ -2,6 +2,7 @@ package org.daisy.validation.epubcheck;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -66,52 +67,71 @@ public class EpubcheckBackendTest {
 	@Test
 	public void testEpubcheckEmptyDir() throws IOException {
 		final String epubFile = "resources/EmptyDir.epub";
-		final List<Issue> issues = EpubcheckBackend
-				.run(epubFile);
-		assertEquals(1, issues.size());
-		final Issue issue = issues.get(0);
+		final List<Issue> issues = EpubcheckBackend.run(epubFile);
+		assertEquals(3, issues.size());
+		int i = 0;
+		Issue issue = issues.get(i++);
+		assertEquals("Version", issue.type);
+		assertNull(issue.file);
+		assertEquals("2.0", issue.txt);
+		issue = issues.get(i++);
 		assertEquals("WARNING", issue.type);
-		assertEquals("", issue.file);
-		assertEquals("zip file contains empty directory emptyDir/", issue.txt);
+		assertEquals("OEBPS/content.opf", issue.file);
+		assertEquals("title element is empty", issue.txt);
 	}
 
 	@Test
 	public void testInvalidUUID() throws IOException {
 		final String epubFile = "resources/InvalidUUID.epub";
-		assertEquals(0, EpubcheckBackend.run(epubFile).size());
+		final List<Issue> issues = EpubcheckBackend.run(epubFile);
+		assertEquals(2, issues.size());
+		int i = 0;
+		Issue issue = issues.get(i++);
+		assertEquals("Version", issue.type);
+		assertNull(issue.file);
+		assertEquals("2.0", issue.txt);
+		issue = issues.get(i++);
+		assertEquals("WARNING", issue.type);
+		assertEquals("OEBPS/content.opf", issue.file);
+		assertEquals("title element is empty", issue.txt);
 	}
 
 	@Test
 	public void testIssue21() throws IOException {
 		final String epubFile = "resources/Issue21.epub";
-		final List<Issue> issues = EpubcheckBackend
-				.run(epubFile);
-		assertEquals(2, issues.size());
+		final List<Issue> issues = EpubcheckBackend.run(epubFile);
+		assertEquals(4, issues.size());
 		int i = 0;
 		Issue issue = issues.get(i++);
-		assertEquals("ERROR", issue.type);
+		assertEquals("Version", issue.type);
+		assertNull(issue.file);
+		assertEquals("2.0", issue.txt);
+		issue = issues.get(i++);
+		assertEquals("WARNING", issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
-		assertEquals(
-				"date value '' is not valid as per http://www.w3.org/TR/NOTE-datetime:zero-length string",
-				issue.txt);
+		assertEquals("title element is empty", issue.txt);
 
 		issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(
-				"toc attribute references resource with non-NCX mime type; \"application/x-dtbncx+xml\" is expected",
+				"date value '' is not valid as per http://www.w3.org/TR/NOTE-datetime:zero-length string",
 				issue.txt);
 	}
 
 	@Test
 	public void testIssue25() throws IOException {
 		final String epubFile = "resources/Issue25.epub";
-		final List<Issue> issues = EpubcheckBackend
-				.run(epubFile);
+		final List<Issue> issues = EpubcheckBackend.run(epubFile);
 		int i = 0;
-		assertEquals(8, issues.size());
+		assertEquals(9, issues.size());
 
 		Issue issue = issues.get(i++);
+		assertEquals("Version", issue.type);
+		assertNull(issue.file);
+		assertEquals("2.0", issue.txt);
+
+		issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
 		assertEquals("mimetype", issue.file);
 		assertEquals(-1, issue.lineNo);
@@ -186,8 +206,7 @@ public class EpubcheckBackendTest {
 	@Test
 	public void testIssue95() throws IOException {
 		final String epubFile = "resources/Issue95.epub";
-		final List<Issue> issues = EpubcheckBackend
-				.run(epubFile);
+		final List<Issue> issues = EpubcheckBackend.run(epubFile);
 		assertEquals(1, issues.size());
 		final Issue issue = issues.get(0);
 		assertEquals("ERROR", issue.type);
@@ -203,23 +222,50 @@ public class EpubcheckBackendTest {
 	public void testIssueJoyce() throws IOException {
 		final String epubFile = "resources/joyce-a-portrait-of-the-artist-as-a-young-man.epub";
 		List<Issue> issues = EpubcheckBackend.run(epubFile);
-		assertEquals(0, issues.size());
+		assertEquals(1, issues.size());
+		final Issue issue = issues.get(0);
+		assertEquals("Version", issue.type);
+		assertNull(issue.file);
+		assertEquals("2.0", issue.txt);
+
 	}
 
 	@Test
 	public void testIssueMetaInfoNotOPF() throws IOException {
 		final String epubFile = "resources/MetaInfNotOPF.epub";
 		List<Issue> issues = EpubcheckBackend.run(epubFile);
-		assertEquals(0, issues.size());
+		assertEquals(2, issues.size());
+		int i = 0;
+		Issue issue = issues.get(i++);
+		assertEquals("Version", issue.type);
+		assertNull(issue.file);
+		assertEquals("2.0", issue.txt);
+
+		issue = issues.get(i++);
+		assertEquals("WARNING", issue.type);
+		assertEquals("OEBPS/content.opf", issue.file);
+		assertEquals("title element is empty", issue.txt);
 	}
 
 	@Test
 	public void testNon8601Date() throws IOException {
 		final String epubFile = "resources/Non8601Date.epub";
-		final List<Issue> issues = EpubcheckBackend
-				.run(epubFile);
-		final Issue issue = issues.get(0);
-		assertEquals(1, issues.size());
+		final List<Issue> issues = EpubcheckBackend.run(epubFile);
+		assertEquals(3, issues.size());
+		int i = 0;
+		Issue issue = issues.get(i++);
+		assertEquals("Version", issue.type);
+		assertNull(issue.file);
+		assertEquals("2.0", issue.txt);
+
+		issue = issues.get(i++);
+		assertEquals("WARNING", issue.type);
+		assertEquals("OEBPS/content.opf", issue.file);
+		assertEquals(5, issue.lineNo);
+		assertEquals(15, issue.colNo);
+		assertEquals("title element is empty", issue.txt);
+
+		issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(10, issue.lineNo);
@@ -232,10 +278,23 @@ public class EpubcheckBackendTest {
 	@Test
 	public void testNullDate() throws IOException {
 		final String epubFile = "resources/NullDate.epub";
-		final List<Issue> issues = EpubcheckBackend
-				.run(epubFile);
-		final Issue issue = issues.get(0);
-		assertEquals(1, issues.size());
+		final List<Issue> issues = EpubcheckBackend.run(epubFile);
+		assertEquals(3, issues.size());
+		int i = 0;
+
+		Issue issue = issues.get(i++);
+		assertEquals("Version", issue.type);
+		assertNull(issue.file);
+		assertEquals("2.0", issue.txt);
+
+		issue = issues.get(i++);
+		assertEquals("WARNING", issue.type);
+		assertEquals("OEBPS/content.opf", issue.file);
+		assertEquals(5, issue.lineNo);
+		assertEquals(15, issue.colNo);
+		assertEquals("title element is empty", issue.txt);
+
+		issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(10, issue.lineNo);
@@ -248,12 +307,16 @@ public class EpubcheckBackendTest {
 	@Test
 	public void testOPFIllegalElement_UniqueID() throws IOException {
 		final String epubFile = "resources/OPFIllegalElement_UniqueID.epub";
-		final List<Issue> issues = EpubcheckBackend
-				.run(epubFile);
-		assertEquals(2, issues.size());
+		final List<Issue> issues = EpubcheckBackend.run(epubFile);
+		assertEquals(4, issues.size());
 		int i = 0;
 
 		Issue issue = issues.get(i++);
+		assertEquals("Version", issue.type);
+		assertNull(issue.file);
+		assertEquals("2.0", issue.txt);
+
+		issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(2, issue.lineNo);
@@ -263,23 +326,26 @@ public class EpubcheckBackendTest {
 				issue.txt);
 
 		issue = issues.get(i++);
-		assertEquals("ERROR", issue.type);
+		assertEquals("WARNING", issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
-		assertEquals(-1, issue.lineNo);
-		assertEquals(-1, issue.colNo);
-		assertEquals(
-				"unique-identifier attribute in package element must reference an existing identifier element id",
-				issue.txt);
+		assertEquals(5, issue.lineNo);
+		assertEquals(13, issue.colNo);
+		assertEquals("title element is empty", issue.txt);
 	}
 
 	@Test
 	public void testOPFIllegalElement() throws IOException {
 		final String epubFile = "resources/OPFIllegalElement.epub";
 		List<Issue> issues = EpubcheckBackend.run(epubFile);
-		assertEquals(1, issues.size());
+		assertEquals(3, issues.size());
 		int i = 0;
 
-		final Issue issue = issues.get(i++);
+		Issue issue = issues.get(i++);
+		assertEquals("Version", issue.type);
+		assertNull(issue.file);
+		assertEquals("2.0", issue.txt);
+
+		issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(2, issue.lineNo);
@@ -293,12 +359,16 @@ public class EpubcheckBackendTest {
 	@Test
 	public void testPageMap() throws IOException {
 		final String epubFile = "resources/PageMap.epub";
-		final List<Issue> issues = EpubcheckBackend
-				.run(epubFile);
-		assertEquals(1, issues.size());
+		final List<Issue> issues = EpubcheckBackend.run(epubFile);
+		assertEquals(2, issues.size());
 		int i = 0;
 
-		final Issue issue = issues.get(i++);
+		Issue issue = issues.get(i++);
+		assertEquals("Version", issue.type);
+		assertNull(issue.file);
+		assertEquals("2.0", issue.txt);
+
+		issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(26, issue.lineNo);
@@ -312,20 +382,30 @@ public class EpubcheckBackendTest {
 	@Test
 	public void testTest() throws IOException {
 		final String epubFile = "resources/Test.epub";
-		final List<Issue> issues = EpubcheckBackend
-				.run(epubFile);
-		assertEquals(0, issues.size());
+		final List<Issue> issues = EpubcheckBackend.run(epubFile);
+		assertEquals(2, issues.size());
 	}
 
 	@Test
 	public void testUniqueIDNotUsed() throws IOException {
 		final String epubFile = "resources/UniqueIDNotUsed.epub";
-		final List<Issue> issues = EpubcheckBackend
-				.run(epubFile);
-		assertEquals(2, issues.size());
+		final List<Issue> issues = EpubcheckBackend.run(epubFile);
+		assertEquals(4, issues.size());
 		int i = 0;
 
 		Issue issue = issues.get(i++);
+		assertEquals("Version", issue.type);
+		assertNull(issue.file);
+		assertEquals("2.0", issue.txt);
+
+		issue = issues.get(i++);
+		assertEquals("WARNING", issue.type);
+		assertEquals("OEBPS/content.opf", issue.file);
+		assertEquals(4, issue.lineNo);
+		assertEquals(13, issue.colNo);
+		assertEquals("title element is empty", issue.txt);
+
+		issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(9, issue.lineNo);
@@ -334,26 +414,28 @@ public class EpubcheckBackendTest {
 				"date value '' is not valid as per http://www.w3.org/TR/NOTE-datetime:zero-length string",
 				issue.txt);
 
-		issue = issues.get(i++);
-		assertEquals("ERROR", issue.type);
-		assertEquals("OEBPS/content.opf", issue.file);
-		assertEquals(-1, issue.lineNo);
-		assertEquals(-1, issue.colNo);
-		assertEquals(
-				"unique-identifier attribute in package element must reference an existing identifier element id",
-				issue.txt);
-
 	}
 
 	@Test
 	public void testUnmanifested() throws IOException {
 		final String epubFile = "resources/Unmanifested.epub";
-		final List<Issue> issues = EpubcheckBackend
-				.run(epubFile);
-		assertEquals(2, issues.size());
+		final List<Issue> issues = EpubcheckBackend.run(epubFile);
+		assertEquals(4, issues.size());
 		int i = 0;
 
 		Issue issue = issues.get(i++);
+		assertEquals("Version", issue.type);
+		assertNull(issue.file);
+		assertEquals("2.0", issue.txt);
+
+		issue = issues.get(i++);
+		assertEquals("WARNING", issue.type);
+		assertEquals("OEBPS/content.opf", issue.file);
+		assertEquals(5, issue.lineNo);
+		assertEquals(15, issue.colNo);
+		assertEquals("title element is empty", issue.txt);
+
+		issue = issues.get(i++);
 		assertEquals("WARNING", issue.type);
 		assertEquals("", issue.file);
 		assertEquals(-1, issue.lineNo);
@@ -362,26 +444,28 @@ public class EpubcheckBackendTest {
 				"item (Unmanifested.txt) exists in the zip file, but is not declared in the OPF file",
 				issue.txt);
 
-		issue = issues.get(i++);
-		assertEquals("WARNING", issue.type);
-		assertEquals("", issue.file);
-		assertEquals(-1, issue.lineNo);
-		assertEquals(-1, issue.colNo);
-		assertEquals(
-				"item (OEBPS/Unmanifested2.txt) exists in the zip file, but is not declared in the OPF file",
-				issue.txt);
-
 	}
 
 	@Test
 	public void testUnmanifestedGuideItems() throws IOException {
 		final String epubFile = "resources/UnmanifestedGuideItems.epub";
-		final List<Issue> issues = EpubcheckBackend
-				.run(epubFile);
-		assertEquals(2, issues.size());
+		final List<Issue> issues = EpubcheckBackend.run(epubFile);
+		assertEquals(4, issues.size());
 		int i = 0;
 
 		Issue issue = issues.get(i++);
+		assertEquals("Version", issue.type);
+		assertNull(issue.file);
+		assertEquals("2.0", issue.txt);
+
+		issue = issues.get(i++);
+		assertEquals("WARNING", issue.type);
+		assertEquals("OEBPS/content.opf", issue.file);
+		assertEquals(5, issue.lineNo);
+		assertEquals(15, issue.colNo);
+		assertEquals("title element is empty", issue.txt);
+
+		issue = issues.get(i++);
 		assertEquals("ERROR", issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(29, issue.lineNo);
@@ -390,22 +474,14 @@ public class EpubcheckBackendTest {
 				"File listed in reference element in guide was not declared in OPF manifest: OEBPS/toc.html",
 				issue.txt);
 
-		issue = issues.get(i++);
-		assertEquals("ERROR", issue.type);
-		assertEquals("OEBPS/content.opf", issue.file);
-		assertEquals(29, issue.lineNo);
-		assertEquals(67, issue.colNo);
-		assertEquals(
-				"'OEBPS/toc.html': referenced resource missing in the package",
-				issue.txt);
-
 	}
 
 	@Test
 	public void testGetPathToEpubRoot() throws IOException, SecurityException,
 			NoSuchMethodException, IllegalArgumentException,
 			IllegalAccessException, InvocationTargetException {
-		final String[] strs = (String[]) Utils.getEntriesInEpub(new File("resources/Issue25.epub"));
+		final String[] strs = Utils.getEntriesInEpub(new File(
+				"resources/Issue25.epub"));
 		final String expString = "[mimetype, META-INF/container.xml, OEBPS/chapter01.html, OEBPS/chapter02.html, OEBPS/chapter03.html, OEBPS/chapter04.html, OEBPS/chapter05.html, OEBPS/chapter06.html, OEBPS/chapter07.html, OEBPS/chapter08.html, OEBPS/chapter09.html, OEBPS/chapter10.html, OEBPS/chapter11.html, OEBPS/chapter12.html, OEBPS/content.opf, OEBPS/images/holmes.jpg, OEBPS/legal_preface.html, OEBPS/page-template.xpgt, OEBPS/stylesheet.css, OEBPS/title_page.html, OEBPS/toc.html, OEBPS/toc.ncx, OEBPS/trailing_legalese.html]";
 
 		final List<String> expected = new ArrayList<String>();
@@ -427,7 +503,8 @@ public class EpubcheckBackendTest {
 		for (final String str : exp) {
 			entries.add(str);
 		}
-		assertEquals("mimetype", Utils.normalizeFilename(entries.toArray(new String[0]), "blabla/bloblo/mimetype"));
+		assertEquals("mimetype", Utils.normalizeFilename(
+				entries.toArray(new String[0]), "blabla/bloblo/mimetype"));
 	}
 
 	@Test
@@ -440,7 +517,8 @@ public class EpubcheckBackendTest {
 		for (final String str : exp) {
 			entries.add(str);
 		}
-		assertEquals("", Utils.normalizeFilename(entries.toArray(new String[0]), "blabla/bloblo/mimetypx"));
+		assertEquals("", Utils.normalizeFilename(
+				entries.toArray(new String[0]), "blabla/bloblo/mimetypx"));
 	}
 
 	@Test
@@ -455,6 +533,5 @@ public class EpubcheckBackendTest {
 			IllegalAccessException, InvocationTargetException {
 		assertEquals(-1, Utils.getLineNo("hoho"));
 	}
-
 
 }
