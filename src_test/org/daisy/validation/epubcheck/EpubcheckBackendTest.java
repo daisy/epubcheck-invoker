@@ -61,8 +61,6 @@ public class EpubcheckBackendTest {
 		assertEquals("java.lang.RuntimeException: File " + epubFile
 				+ " does not exist!", issue.txt);
 		assertEquals(0, sysOutsysErr[0].length());
-		assertTrue(sysOutsysErr[1]
-				.matches("(?s:an error occurred getting entries of epubfile .*)"));
 	}
 
 	@Test
@@ -481,7 +479,7 @@ public class EpubcheckBackendTest {
 	public void testGetPathToEpubRoot() throws IOException, SecurityException,
 			NoSuchMethodException, IllegalArgumentException,
 			IllegalAccessException, InvocationTargetException {
-		final String[] strs = Utils.getEntriesInEpub(new File(
+		final List<String> strs = Utils.getEntries(new File(
 				"resources/Issue25.epub"));
 		final String expString = "[mimetype, META-INF/container.xml, OEBPS/chapter01.html, OEBPS/chapter02.html, OEBPS/chapter03.html, OEBPS/chapter04.html, OEBPS/chapter05.html, OEBPS/chapter06.html, OEBPS/chapter07.html, OEBPS/chapter08.html, OEBPS/chapter09.html, OEBPS/chapter10.html, OEBPS/chapter11.html, OEBPS/chapter12.html, OEBPS/content.opf, OEBPS/images/holmes.jpg, OEBPS/legal_preface.html, OEBPS/page-template.xpgt, OEBPS/stylesheet.css, OEBPS/title_page.html, OEBPS/toc.html, OEBPS/toc.ncx, OEBPS/trailing_legalese.html]";
 
@@ -491,7 +489,7 @@ public class EpubcheckBackendTest {
 		for (final String str : exp) {
 			expected.add(str);
 		}
-		assertThat(Arrays.asList(strs), is(expected));
+		assertThat(strs, is(expected));
 	}
 
 	@Test
@@ -505,7 +503,7 @@ public class EpubcheckBackendTest {
 			entries.add(str);
 		}
 		assertEquals("mimetype", Utils.normalizeFilename(
-				entries.toArray(new String[0]), "blabla/bloblo/mimetype"));
+				entries, "blabla/bloblo/mimetype"));
 	}
 
 	@Test
@@ -519,20 +517,20 @@ public class EpubcheckBackendTest {
 			entries.add(str);
 		}
 		assertEquals("", Utils.normalizeFilename(
-				entries.toArray(new String[0]), "blabla/bloblo/mimetypx"));
+				entries, "blabla/bloblo/mimetypx"));
 	}
 
 	@Test
 	public void testLineNo() throws IllegalArgumentException,
 			IllegalAccessException, InvocationTargetException {
 		final int NUM = 3453;
-		assertEquals(NUM, Utils.getLineNo(Integer.toString(NUM)));
+		assertEquals(NUM, Utils.toInt(Integer.toString(NUM)));
 	}
 
 	@Test
 	public void testLineNoKaputt() throws IllegalArgumentException,
 			IllegalAccessException, InvocationTargetException {
-		assertEquals(-1, Utils.getLineNo("hoho"));
+		assertEquals(-1, Utils.toInt("hoho"));
 	}
 
 }

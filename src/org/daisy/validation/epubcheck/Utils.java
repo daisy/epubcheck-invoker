@@ -2,9 +2,17 @@ package org.daisy.validation.epubcheck;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Enumeration;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
+import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
 
 public final class Utils {
 	private Utils() {
@@ -12,77 +20,68 @@ public final class Utils {
 	}
 
 	/**
-	 * Retrieves a (line or column) number from the given string, if possible.
+	 * Parses the string argument as a signed decimal integer, if possible.
 	 * Otherwise returns -1.
 	 * 
-	 * @param lineNoStr
+	 * @param string
 	 *            string to parse
-	 * @return (line or column) number from the given string, if possible.
-	 *         Otherwise returns -1
+	 * @return the integer value represented by the argument, or -1 if the
+	 *         parsing failed
 	 */
-	public static int getLineNo(final String lineNoStr) {
-		int lineNo = -1;
-		if (lineNoStr != null && lineNoStr.length() > 0) {
-			try {
-				lineNo = Integer.parseInt(lineNoStr);
-			} catch (NumberFormatException nfe) {
-
-			}
-		}
-		return lineNo;
-	}
-
-	/**
-	 * Retrieves entries in the given epub.
-	 * 
-	 * @param epubFilename
-	 *            the name of the epub to get the entries for.
-	 * @return the array of entries in the given epub
-	 * @throws IOException
-	 */
-	public static String[] getEntriesInEpub(File epub) {
-		ZipFile zf = null;
+	public static int toInt(final String string) {
 		try {
-			zf = new ZipFile(epub);
-		} catch (IOException e) {
-			System.err
-					.println("an error occurred getting entries of epubfile '"
-							+ epub.getName()
-							+ "', but we'll continue anyway ...");
-			e.printStackTrace(System.err);
-			return null;
+			return (string != null && string.length() > 0) ? Integer
+					.parseInt(string) : -1;
+		} catch (NumberFormatException nfe) {
+			return -1;
 		}
-		final Enumeration<? extends ZipEntry> k = zf.entries();
-		final String[] entries = new String[zf.size()];
-		int i = 0;
-		while (k.hasMoreElements()) {
-			final ZipEntry ze = k.nextElement();
-			entries[i++] = ze.getName();
-		}
-		return entries;
 	}
 
 	/**
-	 * Normalizes the given longFilename by checking whether any of the given
-	 * epub-entries is a substring of the given longFilename and returning that.
-	 * If no entry is found the empty string is returned.
+	 * Lists the entries of the given ZIP file.
+	 * 
+	 * @param zip
+	 *            the ZIP file to get the entries for.
+	 * @return the list of entries of the given file, or an empty list if a
+	 *         problem occurred
+	 */
+	public static List<String> getEntries(File zip) {
+		try {
+			return Lists.newArrayList(Iterators.transform(
+					Iterators.forEnumeration(new ZipFile(zip).entries()),
+					new Function<ZipEntry, String>() {
+						@Override
+						public String apply(ZipEntry entry) {
+							return entry.getName();
+						}
+					}));
+		} catch (IOException e) {
+			// TODO log
+			return Lists.newArrayList();
+		}
+	}
+
+	/**
+	 * Normalizes the given file name by checking whether any of the given
+	 * entries is a substring of it and returning that. If no entry is found the
+	 * empty string is returned.
 	 * 
 	 * @param entries
-	 *            epub-entries
-	 * @param longFilename
-	 *            filename to check
+	 *            file entries
+	 * @param filename
+	 *            file name to check
 	 * @return normalized filename
 	 */
-	public static String normalizeFilename(final String[] entries,
-			final String longFilename) {
-		if (entries == null || entries.length == 0) {
-			return longFilename;
-		}
-		for (final String filename : entries) {
-			if (longFilename.endsWith(filename)) {
-				return filename;
+	public static String normalizeFilename(final List<String> entries,
+			final String filename) {
+		Preconditions.checkNotNull(filename);
+		Preconditions.checkNotNull(entries);
+		return Iterables.find(entries, new Predicate<String>() {
+			@Override
+			public boolean apply(String entry) {
+				return filename.endsWith(entry);
 			}
-		}
-		return "";
+		}, "");
 	}
+
 }

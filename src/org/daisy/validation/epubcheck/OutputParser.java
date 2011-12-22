@@ -12,6 +12,8 @@ import java.util.regex.Pattern;
 import org.daisy.validation.epubcheck.Issue.Type;
 
 import com.google.common.base.Function;
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
 import com.google.common.io.LineProcessor;
 
@@ -37,16 +39,20 @@ public final class OutputParser implements Function<InputStream, List<Issue>> {
 		};
 
 		private State state = State.PROCESS;
-		private final String[] entries;
+		private final Supplier<List<String>> entries;
 		private final List<Issue> issues = Lists.newLinkedList();
 		private final List<? extends LineProcessor<Issue>> processors = Lists
 				.newArrayList(new IssueProcessor(), new VersionProcessor(),
 						new IgnoreProcessor(), new ClassNotFoundProcessor(),
 						new FileNotFoundProcessor(), new CatchAllProcessor());
 
-		public StatefulParser(File epub) {
-			// TODO lazy init
-			this.entries = Utils.getEntriesInEpub(epub);
+		public StatefulParser(final File epub) {
+			this.entries = Suppliers.memoize(new Supplier<List<String>>() {
+				@Override
+				public List<String> get() {
+					return Utils.getEntries(epub);
+				}
+			});
 		}
 
 		@Override
@@ -126,9 +132,9 @@ public final class OutputParser implements Function<InputStream, List<Issue>> {
 			@Override
 			public void doProcess(MatchResult matcher) {
 				issue = new Issue(Type.safeValueOf(matcher.group(1)),
-						Utils.normalizeFilename(entries, matcher.group(2)),
-						Utils.getLineNo(matcher.group(3)),
-						Utils.getLineNo(matcher.group(4)), matcher.group(5));
+						Utils.normalizeFilename(entries.get(), matcher.group(2)),
+						Utils.toInt(matcher.group(3)),
+						Utils.toInt(matcher.group(4)), matcher.group(5));
 			}
 
 		}
