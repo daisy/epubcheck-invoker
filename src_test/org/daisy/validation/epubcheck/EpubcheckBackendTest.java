@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.daisy.validation.epubcheck.Issue.Type;
 import org.daisy.validation.epubcheck.StdoutStderrSaver.Hook;
 import org.junit.Test;
 
@@ -55,7 +56,7 @@ public class EpubcheckBackendTest {
 		final List<Issue> issues = hook.getIssues();
 		assertEquals(1, issues.size());
 		final Issue issue = issues.get(0);
-		assertEquals("Exception", issue.type);
+		assertEquals(Type.INTERNAL_ERROR, issue.type);
 		assertEquals(epubFile, issue.file);
 		assertEquals("java.lang.RuntimeException: File " + epubFile
 				+ " does not exist!", issue.txt);
@@ -71,11 +72,11 @@ public class EpubcheckBackendTest {
 		assertEquals(3, issues.size());
 		int i = 0;
 		Issue issue = issues.get(i++);
-		assertEquals("Version", issue.type);
+		assertEquals(Type.VERSION, issue.type);
 		assertNull(issue.file);
 		assertEquals("2.0", issue.txt);
 		issue = issues.get(i++);
-		assertEquals("WARNING", issue.type);
+		assertEquals(Type.WARNING, issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals("title element is empty", issue.txt);
 	}
@@ -87,11 +88,11 @@ public class EpubcheckBackendTest {
 		assertEquals(2, issues.size());
 		int i = 0;
 		Issue issue = issues.get(i++);
-		assertEquals("Version", issue.type);
+		assertEquals(Type.VERSION, issue.type);
 		assertNull(issue.file);
 		assertEquals("2.0", issue.txt);
 		issue = issues.get(i++);
-		assertEquals("WARNING", issue.type);
+		assertEquals(Type.WARNING, issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals("title element is empty", issue.txt);
 	}
@@ -103,16 +104,16 @@ public class EpubcheckBackendTest {
 		assertEquals(4, issues.size());
 		int i = 0;
 		Issue issue = issues.get(i++);
-		assertEquals("Version", issue.type);
+		assertEquals(Type.VERSION, issue.type);
 		assertNull(issue.file);
 		assertEquals("2.0", issue.txt);
 		issue = issues.get(i++);
-		assertEquals("WARNING", issue.type);
+		assertEquals(Type.WARNING, issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals("title element is empty", issue.txt);
 
 		issue = issues.get(i++);
-		assertEquals("ERROR", issue.type);
+		assertEquals(Type.ERROR, issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(
 				"date value '' is not valid as per http://www.w3.org/TR/NOTE-datetime:zero-length string",
@@ -127,12 +128,12 @@ public class EpubcheckBackendTest {
 		assertEquals(9, issues.size());
 
 		Issue issue = issues.get(i++);
-		assertEquals("Version", issue.type);
+		assertEquals(Type.VERSION, issue.type);
 		assertNull(issue.file);
 		assertEquals("2.0", issue.txt);
 
 		issue = issues.get(i++);
-		assertEquals("ERROR", issue.type);
+		assertEquals(Type.ERROR, issue.type);
 		assertEquals("mimetype", issue.file);
 		assertEquals(-1, issue.lineNo);
 		assertEquals(-1, issue.colNo);
@@ -141,7 +142,7 @@ public class EpubcheckBackendTest {
 				issue.txt);
 
 		issue = issues.get(i++);
-		assertEquals("ERROR", issue.type);
+		assertEquals(Type.ERROR, issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(35, issue.lineNo);
 		assertEquals(9, issue.colNo);
@@ -149,7 +150,7 @@ public class EpubcheckBackendTest {
 				issue.txt);
 
 		issue = issues.get(i++);
-		assertEquals("ERROR", issue.type);
+		assertEquals(Type.ERROR, issue.type);
 		assertEquals("OEBPS/title_page.html", issue.file);
 		assertEquals(-1, issue.lineNo);
 		assertEquals(-1, issue.colNo);
@@ -158,7 +159,7 @@ public class EpubcheckBackendTest {
 				issue.txt);
 
 		issue = issues.get(i++);
-		assertEquals("WARNING", issue.type);
+		assertEquals(Type.WARNING, issue.type);
 		assertEquals("", issue.file);
 		assertEquals(-1, issue.lineNo);
 		assertEquals(-1, issue.colNo);
@@ -167,7 +168,7 @@ public class EpubcheckBackendTest {
 				issue.txt);
 
 		issue = issues.get(i++);
-		assertEquals("WARNING", issue.type);
+		assertEquals(Type.WARNING, issue.type);
 		assertEquals("", issue.file);
 		assertEquals(-1, issue.lineNo);
 		assertEquals(-1, issue.colNo);
@@ -176,7 +177,7 @@ public class EpubcheckBackendTest {
 				issue.txt);
 
 		issue = issues.get(i++);
-		assertEquals("WARNING", issue.type);
+		assertEquals(Type.WARNING, issue.type);
 		assertEquals("", issue.file);
 		assertEquals(-1, issue.lineNo);
 		assertEquals(-1, issue.colNo);
@@ -185,7 +186,7 @@ public class EpubcheckBackendTest {
 				issue.txt);
 
 		issue = issues.get(i++);
-		assertEquals("ERROR", issue.type);
+		assertEquals(Type.ERROR, issue.type);
 		assertEquals("OEBPS/title_page.html", issue.file);
 		assertEquals(7, issue.lineNo);
 		assertEquals(64, issue.colNo);
@@ -194,7 +195,7 @@ public class EpubcheckBackendTest {
 				issue.txt);
 
 		issue = issues.get(i++);
-		assertEquals("ERROR", issue.type);
+		assertEquals(Type.ERROR, issue.type);
 		assertEquals("OEBPS/chapter01.html", issue.file);
 		assertEquals(9, issue.lineNo);
 		assertEquals(100, issue.colNo);
@@ -209,7 +210,7 @@ public class EpubcheckBackendTest {
 		final List<Issue> issues = EpubcheckBackend.run(epubFile);
 		assertEquals(1, issues.size());
 		final Issue issue = issues.get(0);
-		assertEquals("ERROR", issue.type);
+		assertEquals(Type.ERROR, issue.type);
 		assertEquals("META-INF/container.xml", issue.file);
 		assertEquals(-1, issue.lineNo);
 		assertEquals(-1, issue.colNo);
@@ -224,7 +225,7 @@ public class EpubcheckBackendTest {
 		List<Issue> issues = EpubcheckBackend.run(epubFile);
 		assertEquals(1, issues.size());
 		final Issue issue = issues.get(0);
-		assertEquals("Version", issue.type);
+		assertEquals(Type.VERSION, issue.type);
 		assertNull(issue.file);
 		assertEquals("2.0", issue.txt);
 
@@ -237,12 +238,12 @@ public class EpubcheckBackendTest {
 		assertEquals(2, issues.size());
 		int i = 0;
 		Issue issue = issues.get(i++);
-		assertEquals("Version", issue.type);
+		assertEquals(Type.VERSION, issue.type);
 		assertNull(issue.file);
 		assertEquals("2.0", issue.txt);
 
 		issue = issues.get(i++);
-		assertEquals("WARNING", issue.type);
+		assertEquals(Type.WARNING, issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals("title element is empty", issue.txt);
 	}
@@ -254,19 +255,19 @@ public class EpubcheckBackendTest {
 		assertEquals(3, issues.size());
 		int i = 0;
 		Issue issue = issues.get(i++);
-		assertEquals("Version", issue.type);
+		assertEquals(Type.VERSION, issue.type);
 		assertNull(issue.file);
 		assertEquals("2.0", issue.txt);
 
 		issue = issues.get(i++);
-		assertEquals("WARNING", issue.type);
+		assertEquals(Type.WARNING, issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(5, issue.lineNo);
 		assertEquals(15, issue.colNo);
 		assertEquals("title element is empty", issue.txt);
 
 		issue = issues.get(i++);
-		assertEquals("ERROR", issue.type);
+		assertEquals(Type.ERROR, issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(10, issue.lineNo);
 		assertEquals(35, issue.colNo);
@@ -283,19 +284,19 @@ public class EpubcheckBackendTest {
 		int i = 0;
 
 		Issue issue = issues.get(i++);
-		assertEquals("Version", issue.type);
+		assertEquals(Type.VERSION, issue.type);
 		assertNull(issue.file);
 		assertEquals("2.0", issue.txt);
 
 		issue = issues.get(i++);
-		assertEquals("WARNING", issue.type);
+		assertEquals(Type.WARNING, issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(5, issue.lineNo);
 		assertEquals(15, issue.colNo);
 		assertEquals("title element is empty", issue.txt);
 
 		issue = issues.get(i++);
-		assertEquals("ERROR", issue.type);
+		assertEquals(Type.ERROR, issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(10, issue.lineNo);
 		assertEquals(23, issue.colNo);
@@ -312,12 +313,12 @@ public class EpubcheckBackendTest {
 		int i = 0;
 
 		Issue issue = issues.get(i++);
-		assertEquals("Version", issue.type);
+		assertEquals(Type.VERSION, issue.type);
 		assertNull(issue.file);
 		assertEquals("2.0", issue.txt);
 
 		issue = issues.get(i++);
-		assertEquals("ERROR", issue.type);
+		assertEquals(Type.ERROR, issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(2, issue.lineNo);
 		assertEquals(9, issue.colNo);
@@ -326,7 +327,7 @@ public class EpubcheckBackendTest {
 				issue.txt);
 
 		issue = issues.get(i++);
-		assertEquals("WARNING", issue.type);
+		assertEquals(Type.WARNING, issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(5, issue.lineNo);
 		assertEquals(13, issue.colNo);
@@ -341,12 +342,12 @@ public class EpubcheckBackendTest {
 		int i = 0;
 
 		Issue issue = issues.get(i++);
-		assertEquals("Version", issue.type);
+		assertEquals(Type.VERSION, issue.type);
 		assertNull(issue.file);
 		assertEquals("2.0", issue.txt);
 
 		issue = issues.get(i++);
-		assertEquals("ERROR", issue.type);
+		assertEquals(Type.ERROR, issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(2, issue.lineNo);
 		assertEquals(8, issue.colNo);
@@ -364,12 +365,12 @@ public class EpubcheckBackendTest {
 		int i = 0;
 
 		Issue issue = issues.get(i++);
-		assertEquals("Version", issue.type);
+		assertEquals(Type.VERSION, issue.type);
 		assertNull(issue.file);
 		assertEquals("2.0", issue.txt);
 
 		issue = issues.get(i++);
-		assertEquals("ERROR", issue.type);
+		assertEquals(Type.ERROR, issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(26, issue.lineNo);
 		assertEquals(33, issue.colNo);
@@ -394,19 +395,19 @@ public class EpubcheckBackendTest {
 		int i = 0;
 
 		Issue issue = issues.get(i++);
-		assertEquals("Version", issue.type);
+		assertEquals(Type.VERSION, issue.type);
 		assertNull(issue.file);
 		assertEquals("2.0", issue.txt);
 
 		issue = issues.get(i++);
-		assertEquals("WARNING", issue.type);
+		assertEquals(Type.WARNING, issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(4, issue.lineNo);
 		assertEquals(13, issue.colNo);
 		assertEquals("title element is empty", issue.txt);
 
 		issue = issues.get(i++);
-		assertEquals("ERROR", issue.type);
+		assertEquals(Type.ERROR, issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(9, issue.lineNo);
 		assertEquals(12, issue.colNo);
@@ -424,19 +425,19 @@ public class EpubcheckBackendTest {
 		int i = 0;
 
 		Issue issue = issues.get(i++);
-		assertEquals("Version", issue.type);
+		assertEquals(Type.VERSION, issue.type);
 		assertNull(issue.file);
 		assertEquals("2.0", issue.txt);
 
 		issue = issues.get(i++);
-		assertEquals("WARNING", issue.type);
+		assertEquals(Type.WARNING, issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(5, issue.lineNo);
 		assertEquals(15, issue.colNo);
 		assertEquals("title element is empty", issue.txt);
 
 		issue = issues.get(i++);
-		assertEquals("WARNING", issue.type);
+		assertEquals(Type.WARNING, issue.type);
 		assertEquals("", issue.file);
 		assertEquals(-1, issue.lineNo);
 		assertEquals(-1, issue.colNo);
@@ -454,19 +455,19 @@ public class EpubcheckBackendTest {
 		int i = 0;
 
 		Issue issue = issues.get(i++);
-		assertEquals("Version", issue.type);
+		assertEquals(Type.VERSION, issue.type);
 		assertNull(issue.file);
 		assertEquals("2.0", issue.txt);
 
 		issue = issues.get(i++);
-		assertEquals("WARNING", issue.type);
+		assertEquals(Type.WARNING, issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(5, issue.lineNo);
 		assertEquals(15, issue.colNo);
 		assertEquals("title element is empty", issue.txt);
 
 		issue = issues.get(i++);
-		assertEquals("ERROR", issue.type);
+		assertEquals(Type.ERROR, issue.type);
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(29, issue.lineNo);
 		assertEquals(67, issue.colNo);
