@@ -22,8 +22,8 @@ public final class EpubcheckBackend {
 
 	// TODO externalize jar names (to not have to rebuild after changes to
 	// epubcheck)
-	private static final String[] jars = new String[] { "epubcheck-3.0b3.jar",
-			"commons-compress-1.2.jar", "flute.jar", "jing.jar", "sac.jar",
+	private static final String[] jars = new String[] { "epubcheck-3.0b4.jar",
+			"commons-compress-1.2.jar", "cssparser-0.9.6.jar", "jing.jar", "sac-1.3.jar",
 			"saxon9he.jar" };
 
 	// TODO get number of threads from config
