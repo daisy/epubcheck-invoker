@@ -66,8 +66,10 @@ class NormalState implements ErrorParser.State {
 		@Override
 		public void handle(final String line) {
 			issues.add(new Issue("Exception", "",
-					"Configuration error! lib dir required with entries: "
-							+ EpubcheckBackend.JAR_LIST + ":" + line));
+					"Configuration error!"));
+//			issues.add(new Issue("Exception", "",
+//					"Configuration error! lib dir required with entries: "
+//							+ EpubcheckBackend.JAR_LIST + ":" + line));
 			errorParser.setCurrentState(errorParser.confErrorState);
 		}
 	}

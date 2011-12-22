@@ -1,4 +1,4 @@
-package org.daisy.validation.epubcheck;
+package org.daisy.validation.epubcheck; 
 
 import java.util.List;
 
