@@ -3,7 +3,6 @@ package org.daisy.validation.epubcheck;
 import java.io.File;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -44,14 +43,9 @@ public final class EpubcheckBackend {
 				});
 		try {
 			return result.get();
-		} catch (InterruptedException e) {
-			// TODO create an 'Exception' Issue
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO create an 'Exception' Issue
-			e.printStackTrace();
+		} catch (Exception e) {
+			return Lists.newArrayList(new Issue("Exception",null,"Internal Error: "+e.getMessage()));
 		}
-		return null;
 	}
 
 	private List<Issue> doValidate(File epub) {
