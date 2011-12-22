@@ -7,6 +7,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.daisy.validation.epubcheck.Issue.Type;
+
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -22,8 +24,8 @@ public final class EpubcheckBackend {
 	// TODO externalize jar names (to not have to rebuild after changes to
 	// epubcheck)
 	private static final String[] jars = new String[] { "epubcheck-3.0b4.jar",
-			"commons-compress-1.2.jar", "cssparser-0.9.6.jar", "jing.jar", "sac-1.3.jar",
-			"saxon9he.jar" };
+			"commons-compress-1.2.jar", "cssparser-0.9.6.jar", "jing.jar",
+			"sac-1.3.jar", "saxon9he.jar" };
 
 	// TODO get number of threads from config
 	private final ExecutorService executor = Executors.newFixedThreadPool(10);
@@ -44,7 +46,9 @@ public final class EpubcheckBackend {
 		try {
 			return result.get();
 		} catch (Exception e) {
-			return Lists.newArrayList(new Issue("Exception",null,"Internal Error: "+e.getMessage()));
+			//TOOD log
+			return Lists.newArrayList(new Issue(Type.INTERNAL_ERROR,
+					"Internal Error: " + e.getMessage()));
 		}
 	}
 
@@ -58,11 +62,10 @@ public final class EpubcheckBackend {
 										new Function<String, String>() {
 											@Override
 											public String apply(String jar) {
-												return "lib/"+jar;
+												return "lib/" + jar;
 											}
 										})),
-						"com.adobe.epubcheck.tool.Checker", epub
-								.getPath()));
+						"com.adobe.epubcheck.tool.Checker", epub.getPath()));
 		return cmdExec.run(new OutputParser(epub));
 	}
 }

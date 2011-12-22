@@ -9,6 +9,8 @@ import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.daisy.validation.epubcheck.Issue.Type;
+
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.io.LineProcessor;
@@ -79,8 +81,8 @@ public final class OutputParser implements Function<InputStream, List<Issue>> {
 						return;
 					}
 				} catch (IOException e) {
-					// TODO create issue
-					e.printStackTrace();
+					// TODO log
+					issues.add(new Issue(Type.INTERNAL_ERROR,e.getMessage()));
 				}
 			}
 			throw new RuntimeException("No line processor caught this line:"
@@ -90,7 +92,7 @@ public final class OutputParser implements Function<InputStream, List<Issue>> {
 		private class ClassNotFoundProcessor extends GenericIssueProcessor {
 
 			public ClassNotFoundProcessor() {
-				super(Patterns.CLASS_NOT_FOUND, new Issue("Exception", null,
+				super(Patterns.CLASS_NOT_FOUND, new Issue(Type.INTERNAL_ERROR,
 						"Classpath configuration error"));
 			}
 
@@ -108,7 +110,8 @@ public final class OutputParser implements Function<InputStream, List<Issue>> {
 
 			@Override
 			public void doProcess(MatchResult match) {
-				issue = new Issue("Exception", match.group(1), match.group());
+				issue = new Issue(Type.INTERNAL_ERROR, match.group(1),
+						match.group());
 				state = State.IGNORE_STACK_TRACE;
 			}
 
@@ -122,10 +125,10 @@ public final class OutputParser implements Function<InputStream, List<Issue>> {
 
 			@Override
 			public void doProcess(MatchResult matcher) {
-				issue = new Issue(matcher.group(1), Utils.normalizeFilename(
-						entries, matcher.group(2)), Utils.getLineNo(matcher
-						.group(3)), Utils.getLineNo(matcher.group(4)),
-						matcher.group(5));
+				issue = new Issue(Type.safeValueOf(matcher.group(1)),
+						Utils.normalizeFilename(entries, matcher.group(2)),
+						Utils.getLineNo(matcher.group(3)),
+						Utils.getLineNo(matcher.group(4)), matcher.group(5));
 			}
 
 		}
@@ -138,7 +141,7 @@ public final class OutputParser implements Function<InputStream, List<Issue>> {
 
 			@Override
 			public void doProcess(MatchResult match) {
-				issue = new Issue("Version", null, match.group(1));
+				issue = new Issue(Type.VERSION, null, match.group(1));
 			}
 
 		}
