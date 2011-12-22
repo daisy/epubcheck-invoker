@@ -5,9 +5,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -100,19 +100,6 @@ public class EpubcheckBackendTest {
 		assertEquals("OEBPS/content.opf", issue.file);
 		assertEquals(
 				"toc attribute references resource with non-NCX mime type; \"application/x-dtbncx+xml\" is expected",
-				issue.txt);
-	}
-
-	@Test
-	public void testError() throws IllegalArgumentException,
-			IllegalAccessException, InvocationTargetException {
-		final String msg = "ERROR: resources/Issue21.epub/OEBPS/content.opf(9,12): date value '' is not valid as per http://www.w3.org/TR/NOTE-datetime:zero-length string";
-		final Issue issue = (Issue) generateIssue.invoke(null,
-				msg, "resources/Issue21.epub", null);
-		assertEquals("ERROR", issue.type);
-		assertEquals("resources/Issue21.epub/OEBPS/content.opf", issue.file);
-		assertEquals(
-				"date value '' is not valid as per http://www.w3.org/TR/NOTE-datetime:zero-length string",
 				issue.txt);
 	}
 
@@ -418,8 +405,7 @@ public class EpubcheckBackendTest {
 	public void testGetPathToEpubRoot() throws IOException, SecurityException,
 			NoSuchMethodException, IllegalArgumentException,
 			IllegalAccessException, InvocationTargetException {
-		final String[] strs = (String[]) getEntriesInEpub.invoke(null,
-				"resources/Issue25.epub");
+		final String[] strs = (String[]) Utils.getEntriesInEpub(new File("resources/Issue25.epub"));
 		final String expString = "[mimetype, META-INF/container.xml, OEBPS/chapter01.html, OEBPS/chapter02.html, OEBPS/chapter03.html, OEBPS/chapter04.html, OEBPS/chapter05.html, OEBPS/chapter06.html, OEBPS/chapter07.html, OEBPS/chapter08.html, OEBPS/chapter09.html, OEBPS/chapter10.html, OEBPS/chapter11.html, OEBPS/chapter12.html, OEBPS/content.opf, OEBPS/images/holmes.jpg, OEBPS/legal_preface.html, OEBPS/page-template.xpgt, OEBPS/stylesheet.css, OEBPS/title_page.html, OEBPS/toc.html, OEBPS/toc.ncx, OEBPS/trailing_legalese.html]";
 
 		final List<String> expected = new ArrayList<String>();
@@ -441,8 +427,7 @@ public class EpubcheckBackendTest {
 		for (final String str : exp) {
 			entries.add(str);
 		}
-		assertEquals("mimetype", normalizeFilename.invoke(null,
-				entries.toArray(new String[0]), "blabla/bloblo/mimetype"));
+		assertEquals("mimetype", Utils.normalizeFilename(entries.toArray(new String[0]), "blabla/bloblo/mimetype"));
 	}
 
 	@Test
@@ -455,47 +440,21 @@ public class EpubcheckBackendTest {
 		for (final String str : exp) {
 			entries.add(str);
 		}
-		assertEquals("", normalizeFilename.invoke(null,
-				entries.toArray(new String[0]), "blabla/bloblo/mimetypx"));
+		assertEquals("", Utils.normalizeFilename(entries.toArray(new String[0]), "blabla/bloblo/mimetypx"));
 	}
 
 	@Test
 	public void testLineNo() throws IllegalArgumentException,
 			IllegalAccessException, InvocationTargetException {
 		final int NUM = 3453;
-		assertEquals(NUM, getLineNo.invoke(null, Integer.toString(NUM)));
+		assertEquals(NUM, Utils.getLineNo(Integer.toString(NUM)));
 	}
 
 	@Test
 	public void testLineNoKaputt() throws IllegalArgumentException,
 			IllegalAccessException, InvocationTargetException {
-		assertEquals(-1, getLineNo.invoke(null, "hoho"));
+		assertEquals(-1, Utils.getLineNo("hoho"));
 	}
 
-	private static Method getEntriesInEpub = null;
-	private static Method getLineNo = null;
-	private static Method generateIssue = null;
-	private static Method normalizeFilename = null;
 
-	static {
-		try {
-			getEntriesInEpub = NormalState.class.getDeclaredMethod(
-					"getEntriesInEpub", String.class);
-			getLineNo = NormalState.class.getDeclaredMethod("getLineNo",
-					String.class);
-			generateIssue = NormalState.class
-					.getDeclaredMethod("generateIssue", String.class,
-							String.class, String[].class);
-			normalizeFilename = NormalState.class.getDeclaredMethod(
-					"normalizeFilename", String[].class, String.class);
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		}
-		getEntriesInEpub.setAccessible(true);
-		getLineNo.setAccessible(true);
-		generateIssue.setAccessible(true);
-		normalizeFilename.setAccessible(true);
-	}
 }

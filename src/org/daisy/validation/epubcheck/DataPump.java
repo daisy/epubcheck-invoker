@@ -5,42 +5,38 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public class DataPump implements Runnable {
+import com.google.common.io.LineProcessor;
 
-	/**
-	 * Source of data stream
-	 */
-	private final InputStream in;
+public class DataPump<T> implements Runnable {
 
-	private final LineProcessor lineProcessor;
+	private final InputStream is;
+	private final LineProcessor<T> lineProcessor;
 
 	/**
 	 * Connect pump from an Input Stream to a String Buffer
 	 * 
-	 * @param dataSource
+	 * @param is
 	 *            Data Source
 	 * @param buffer
 	 *            Data Buffer (holding pond)
 	 */
-	public DataPump(final InputStream dataSource,
-			final LineProcessor theLineProcessor) {
-		in = dataSource;
-		lineProcessor = theLineProcessor;
+	public DataPump(final InputStream is, final LineProcessor<T> lineProcessor) {
+		this.is = is;
+		this.lineProcessor = lineProcessor;
 	}
 
 	/**
-	 * Extracts text line by line from an input stream into a
-	 * LineProcessor.
+	 * Extracts text line by line from an input stream into a LineProcessor.
 	 * 
 	 */
 	public void run() {
 		try {
 			final BufferedReader bReader = new BufferedReader(
-					new InputStreamReader(in));
+					new InputStreamReader(is));
 			try {
 				String line;
 				while ((line = bReader.readLine()) != null) {
-					lineProcessor.process(line);
+					lineProcessor.processLine(line);
 				}
 			} finally {
 				if (bReader != null) {
@@ -48,12 +44,8 @@ public class DataPump implements Runnable {
 				}
 			}
 		} catch (final IOException ex) {
-			ex.printStackTrace(System.err);
+			throw new RuntimeException(ex);
 		}
 	}
 
-}
-
-interface LineProcessor {
-	public void process(final String line);
 }
