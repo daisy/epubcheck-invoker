@@ -2,6 +2,7 @@ package org.daisy.validation.epubcheck;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -14,6 +15,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 
 public final class CommandExecutor<T> {
 
@@ -28,14 +32,20 @@ public final class CommandExecutor<T> {
 	private final TimeUnit timeoutUnit = TimeUnit.MINUTES;
 
 	public CommandExecutor(List<String> args) {
-		// TODO check args not null
-		// TODO check args not empty
-		// TODO set unmodifiable list
-		this.args = args;
+		Preconditions.checkNotNull(args);
+		for (String arg : args) {
+			Preconditions.checkArgument(!Strings.isNullOrEmpty(arg));
+		}
+		this.args = ImmutableList.copyOf(args);
+	}
+
+	public CommandExecutor(String... args) {
+		this(Arrays.asList(Preconditions.checkNotNull(args)));
 	}
 
 	public T run(final Function<InputStream, T> streamProcessor) {
-
+		Preconditions.checkNotNull(streamProcessor);
+		
 		ProcessBuilder processBuilder = new ProcessBuilder(args);
 		processBuilder.redirectErrorStream(true);
 		final Process process;
@@ -51,7 +61,6 @@ public final class CommandExecutor<T> {
 				return streamProcessor.apply(process.getInputStream());
 			}
 		});
-		
 
 		// sync threads
 		ScheduledFuture<?> interrupter = timedExecutor.schedule(
