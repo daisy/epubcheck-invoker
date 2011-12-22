@@ -38,12 +38,12 @@ public final class OutputParser implements Function<InputStream, List<Issue>> {
 		private final String[] entries;
 		private final List<Issue> issues = Lists.newLinkedList();
 		private final List<? extends LineProcessor<Issue>> processors = Lists
-				.newArrayList(new IssueProcessor(), new IgnoreProcessor(),
-						new ClassNotFoundProcessor(),
+				.newArrayList(new IssueProcessor(), new VersionProcessor(),
+						new IgnoreProcessor(), new ClassNotFoundProcessor(),
 						new FileNotFoundProcessor(), new CatchAllProcessor());
 
 		public StatefulParser(File epub) {
-			//TODO lazy init
+			// TODO lazy init
 			this.entries = Utils.getEntriesInEpub(epub);
 		}
 
@@ -114,7 +114,7 @@ public final class OutputParser implements Function<InputStream, List<Issue>> {
 
 		}
 
-		private  class IssueProcessor extends GenericIssueProcessor {
+		private class IssueProcessor extends GenericIssueProcessor {
 
 			public IssueProcessor() {
 				super(Patterns.ISSUE);
@@ -126,6 +126,19 @@ public final class OutputParser implements Function<InputStream, List<Issue>> {
 						entries, matcher.group(2)), Utils.getLineNo(matcher
 						.group(3)), Utils.getLineNo(matcher.group(4)),
 						matcher.group(5));
+			}
+
+		}
+
+		private class VersionProcessor extends GenericIssueProcessor {
+
+			public VersionProcessor() {
+				super(Patterns.VERSION);
+			}
+
+			@Override
+			public void doProcess(MatchResult match) {
+				issue = new Issue("Version", null, match.group(1));
 			}
 
 		}
