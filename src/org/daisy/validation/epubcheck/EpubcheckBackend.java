@@ -11,6 +11,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeoutException;
 
 import org.daisy.validation.epubcheck.Issue.Type;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -18,6 +20,8 @@ import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.MoreExecutors;
 
 public final class EpubcheckBackend {
+
+	public static final Logger LOG = LoggerFactory.getLogger(EpubcheckBackend.class);
 
 	private static final EpubcheckBackend INSTANCE = new EpubcheckBackend();
 
@@ -61,6 +65,7 @@ public final class EpubcheckBackend {
 	}
 
 	private List<Issue> doValidate(File epub) {
+		LOG.info("Validating {}", epub);
 		CommandExecutor<List<Issue>> cmdExec = new CommandExecutor<List<Issue>>(
 				Lists.newArrayList(
 						"java",
