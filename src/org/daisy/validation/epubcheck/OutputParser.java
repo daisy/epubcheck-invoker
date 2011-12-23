@@ -10,6 +10,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.daisy.validation.epubcheck.Issue.Type;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
@@ -19,6 +21,7 @@ import com.google.common.io.LineProcessor;
 
 public final class OutputParser implements Function<InputStream, List<Issue>> {
 
+	private static final Logger LOG = LoggerFactory.getLogger(OutputParser.class); 
 	private final File epub;
 
 	public OutputParser(File epub) {
@@ -87,7 +90,7 @@ public final class OutputParser implements Function<InputStream, List<Issue>> {
 						return;
 					}
 				} catch (IOException e) {
-					// TODO log
+					LOG.warn("Unexpected IOException: {}",e.getMessage());
 					issues.add(new Issue(Type.INTERNAL_ERROR,e.getMessage()));
 				}
 			}

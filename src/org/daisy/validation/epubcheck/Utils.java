@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
@@ -14,6 +17,9 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 
 public final class Utils {
+
+	private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
+
 	private Utils() {
 		// static utils
 	}
@@ -32,6 +38,7 @@ public final class Utils {
 			return (string != null && string.length() > 0) ? Integer
 					.parseInt(string) : -1;
 		} catch (NumberFormatException nfe) {
+			LOG.warn("Couldn't parse '{}' into an integer", string);
 			return -1;
 		}
 	}
@@ -55,7 +62,7 @@ public final class Utils {
 						}
 					}));
 		} catch (IOException e) {
-			// TODO log
+			LOG.warn("Couldn't get entries for file {}", zip.getAbsolutePath());
 			return Lists.newArrayList();
 		}
 	}

@@ -1,9 +1,14 @@
 package org.daisy.validation.epubcheck;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 public final class Issue {
+
+	private static final Logger LOG = LoggerFactory.getLogger(Issue.class);
 
 	public static enum Type {
 		WARNING, ERROR, VERSION, INTERNAL_ERROR;
@@ -13,7 +18,7 @@ public final class Issue {
 			try {
 				return valueOf(name);
 			} catch (IllegalArgumentException e) {
-				//TODO log
+				LOG.warn("Illegal argument in Type#sageValueOf: {}", name);
 				return INTERNAL_ERROR;
 			}
 		}
@@ -22,8 +27,7 @@ public final class Issue {
 		public String toString() {
 			return name().replace('_', ' ');
 		}
-		
-		
+
 	}
 
 	public final Type type;
