@@ -11,6 +11,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -18,11 +19,13 @@ import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
+import com.google.common.util.concurrent.MoreExecutors;
 
 public final class CommandExecutor<T> {
 
-	private static final ScheduledExecutorService timedExecutor = Executors
-			.newScheduledThreadPool(1);
+	private static final ScheduledExecutorService timedExecutor = MoreExecutors
+			.getExitingScheduledExecutorService((ScheduledThreadPoolExecutor) Executors
+					.newScheduledThreadPool(1));
 	private static final ExecutorService cachedThreadPool = Executors
 			.newCachedThreadPool();
 
@@ -43,9 +46,10 @@ public final class CommandExecutor<T> {
 		this(Arrays.asList(Preconditions.checkNotNull(args)));
 	}
 
-	public T run(final Function<InputStream, T> streamProcessor) {
+	public T run(final Function<InputStream, T> streamProcessor)
+			throws InterruptedException, ExecutionException, TimeoutException {
 		Preconditions.checkNotNull(streamProcessor);
-		
+
 		ProcessBuilder processBuilder = new ProcessBuilder(args);
 		processBuilder.redirectErrorStream(true);
 		final Process process;
@@ -75,21 +79,7 @@ public final class CommandExecutor<T> {
 			Thread.interrupted();
 		}
 
-		try {
-			return result.get(timeout, timeoutUnit);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new RuntimeException();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new RuntimeException();
-		} catch (TimeoutException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new RuntimeException();
-		}
+		return result.get(timeout, timeoutUnit);
 
 	}
 

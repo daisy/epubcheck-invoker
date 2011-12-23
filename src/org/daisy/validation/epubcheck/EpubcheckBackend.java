@@ -3,15 +3,19 @@ package org.daisy.validation.epubcheck;
 import java.io.File;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeoutException;
 
 import org.daisy.validation.epubcheck.Issue.Type;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.MoreExecutors;
 
 public final class EpubcheckBackend {
 
@@ -28,7 +32,9 @@ public final class EpubcheckBackend {
 			"sac-1.3.jar", "saxon9he.jar" };
 
 	// TODO get number of threads from config
-	private final ExecutorService executor = Executors.newFixedThreadPool(10);
+	private final ExecutorService executor = MoreExecutors
+			.getExitingExecutorService((ThreadPoolExecutor) Executors
+					.newFixedThreadPool(10));
 
 	public List<Issue> validate(String epubPath) {
 		return validate(new File(epubPath));
@@ -39,16 +45,18 @@ public final class EpubcheckBackend {
 				.submit(new Callable<List<Issue>>() {
 
 					@Override
-					public List<Issue> call() throws Exception {
+					public List<Issue> call() {
 						return doValidate(epubFile);
 					}
 				});
 		try {
 			return result.get();
-		} catch (Exception e) {
-			//TOOD log
+		} catch (InterruptedException e) {
 			return Lists.newArrayList(new Issue(Type.INTERNAL_ERROR,
-					"Internal Error: " + e.getMessage()));
+					"InterruptedException - " + e.getMessage()));
+		} catch (ExecutionException e) {
+			// Shouldn't happen
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -66,6 +74,18 @@ public final class EpubcheckBackend {
 											}
 										})),
 						"com.adobe.epubcheck.tool.Checker", epub.getPath()));
-		return cmdExec.run(new OutputParser(epub));
+		try {
+			return cmdExec.run(new OutputParser(epub));
+		} catch (InterruptedException e) {
+			return Lists.newArrayList(new Issue(Type.INTERNAL_ERROR,
+					"InterruptedException - " + e.getMessage()));
+		} catch (ExecutionException e) {
+			return Lists.newArrayList(new Issue(Type.INTERNAL_ERROR,
+
+			e.getCause().getClass().getSimpleName() + " - " + e.getMessage()));
+		} catch (TimeoutException e) {
+			return Lists.newArrayList(new Issue(Type.INTERNAL_ERROR,
+					"Process timed out"));
+		}
 	}
 }
