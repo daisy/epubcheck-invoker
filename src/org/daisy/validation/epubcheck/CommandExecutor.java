@@ -30,9 +30,6 @@ public final class CommandExecutor<T> {
 			.newCachedThreadPool();
 
 	private final List<String> args;
-	// TODO make timeout configurable
-	private final long timeout = 10;
-	private final TimeUnit timeoutUnit = TimeUnit.MINUTES;
 
 	public CommandExecutor(List<String> args) {
 		Preconditions.checkNotNull(args);
@@ -46,7 +43,7 @@ public final class CommandExecutor<T> {
 		this(Arrays.asList(Preconditions.checkNotNull(args)));
 	}
 
-	public T run(final Function<InputStream, T> streamProcessor)
+	public T run(final Function<InputStream, T> streamProcessor, Long timeout, TimeUnit timeoutUnit)
 			throws InterruptedException, ExecutionException, TimeoutException {
 		Preconditions.checkNotNull(streamProcessor);
 
@@ -66,7 +63,7 @@ public final class CommandExecutor<T> {
 			}
 		});
 
-		// sync threads
+		// TODO use Guava's TimeLimiter
 		ScheduledFuture<?> interrupter = timedExecutor.schedule(
 				new ThreadInterrupter(Thread.currentThread()), timeout,
 				timeoutUnit);
