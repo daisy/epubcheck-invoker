@@ -11,7 +11,7 @@ public final class Issue {
 	private static final Logger LOG = LoggerFactory.getLogger(Issue.class);
 
 	public static enum Type {
-		WARNING, ERROR, VERSION, INTERNAL_ERROR;
+		WARNING, ERROR, EPUB_VERSION, INTERNAL_ERROR, EPUBCHECK_VERSION;
 
 		public static Type safeValueOf(String name) {
 			Preconditions.checkNotNull(name);

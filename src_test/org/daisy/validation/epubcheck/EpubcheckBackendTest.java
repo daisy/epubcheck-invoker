@@ -68,7 +68,7 @@ public class EpubcheckBackendTest {
 		assertEquals(3, issues.size());
 		int i = 0;
 		Issue issue = issues.get(i++);
-		assertEquals(Type.VERSION, issue.type);
+		assertEquals(Type.EPUB_VERSION, issue.type);
 		assertNull(issue.file);
 		assertEquals("2.0", issue.txt);
 		issue = issues.get(i++);
@@ -84,7 +84,7 @@ public class EpubcheckBackendTest {
 		assertEquals(2, issues.size());
 		int i = 0;
 		Issue issue = issues.get(i++);
-		assertEquals(Type.VERSION, issue.type);
+		assertEquals(Type.EPUB_VERSION, issue.type);
 		assertNull(issue.file);
 		assertEquals("2.0", issue.txt);
 		issue = issues.get(i++);
@@ -100,7 +100,7 @@ public class EpubcheckBackendTest {
 		assertEquals(4, issues.size());
 		int i = 0;
 		Issue issue = issues.get(i++);
-		assertEquals(Type.VERSION, issue.type);
+		assertEquals(Type.EPUB_VERSION, issue.type);
 		assertNull(issue.file);
 		assertEquals("2.0", issue.txt);
 		issue = issues.get(i++);
@@ -124,7 +124,7 @@ public class EpubcheckBackendTest {
 		assertEquals(9, issues.size());
 
 		Issue issue = issues.get(i++);
-		assertEquals(Type.VERSION, issue.type);
+		assertEquals(Type.EPUB_VERSION, issue.type);
 		assertNull(issue.file);
 		assertEquals("2.0", issue.txt);
 
@@ -221,7 +221,7 @@ public class EpubcheckBackendTest {
 		List<Issue> issues = EpubcheckBackend.run(epubFile);
 		assertEquals(1, issues.size());
 		final Issue issue = issues.get(0);
-		assertEquals(Type.VERSION, issue.type);
+		assertEquals(Type.EPUB_VERSION, issue.type);
 		assertNull(issue.file);
 		assertEquals("2.0", issue.txt);
 
@@ -234,7 +234,7 @@ public class EpubcheckBackendTest {
 		assertEquals(2, issues.size());
 		int i = 0;
 		Issue issue = issues.get(i++);
-		assertEquals(Type.VERSION, issue.type);
+		assertEquals(Type.EPUB_VERSION, issue.type);
 		assertNull(issue.file);
 		assertEquals("2.0", issue.txt);
 
@@ -251,7 +251,7 @@ public class EpubcheckBackendTest {
 		assertEquals(3, issues.size());
 		int i = 0;
 		Issue issue = issues.get(i++);
-		assertEquals(Type.VERSION, issue.type);
+		assertEquals(Type.EPUB_VERSION, issue.type);
 		assertNull(issue.file);
 		assertEquals("2.0", issue.txt);
 
@@ -280,7 +280,7 @@ public class EpubcheckBackendTest {
 		int i = 0;
 
 		Issue issue = issues.get(i++);
-		assertEquals(Type.VERSION, issue.type);
+		assertEquals(Type.EPUB_VERSION, issue.type);
 		assertNull(issue.file);
 		assertEquals("2.0", issue.txt);
 
@@ -309,7 +309,7 @@ public class EpubcheckBackendTest {
 		int i = 0;
 
 		Issue issue = issues.get(i++);
-		assertEquals(Type.VERSION, issue.type);
+		assertEquals(Type.EPUB_VERSION, issue.type);
 		assertNull(issue.file);
 		assertEquals("2.0", issue.txt);
 
@@ -338,7 +338,7 @@ public class EpubcheckBackendTest {
 		int i = 0;
 
 		Issue issue = issues.get(i++);
-		assertEquals(Type.VERSION, issue.type);
+		assertEquals(Type.EPUB_VERSION, issue.type);
 		assertNull(issue.file);
 		assertEquals("2.0", issue.txt);
 
@@ -361,7 +361,7 @@ public class EpubcheckBackendTest {
 		int i = 0;
 
 		Issue issue = issues.get(i++);
-		assertEquals(Type.VERSION, issue.type);
+		assertEquals(Type.EPUB_VERSION, issue.type);
 		assertNull(issue.file);
 		assertEquals("2.0", issue.txt);
 
@@ -391,7 +391,7 @@ public class EpubcheckBackendTest {
 		int i = 0;
 
 		Issue issue = issues.get(i++);
-		assertEquals(Type.VERSION, issue.type);
+		assertEquals(Type.EPUB_VERSION, issue.type);
 		assertNull(issue.file);
 		assertEquals("2.0", issue.txt);
 
@@ -421,7 +421,7 @@ public class EpubcheckBackendTest {
 		int i = 0;
 
 		Issue issue = issues.get(i++);
-		assertEquals(Type.VERSION, issue.type);
+		assertEquals(Type.EPUB_VERSION, issue.type);
 		assertNull(issue.file);
 		assertEquals("2.0", issue.txt);
 
@@ -451,7 +451,7 @@ public class EpubcheckBackendTest {
 		int i = 0;
 
 		Issue issue = issues.get(i++);
-		assertEquals(Type.VERSION, issue.type);
+		assertEquals(Type.EPUB_VERSION, issue.type);
 		assertNull(issue.file);
 		assertEquals("2.0", issue.txt);
 

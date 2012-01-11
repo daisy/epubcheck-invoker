@@ -45,7 +45,8 @@ public final class OutputParser implements Function<InputStream, List<Issue>> {
 		private final Supplier<List<String>> entries;
 		private final List<Issue> issues = Lists.newLinkedList();
 		private final List<? extends LineProcessor<Issue>> processors = Lists
-				.newArrayList(new IssueProcessor(), new VersionProcessor(),
+				.newArrayList(new IssueProcessor(), new EpubcheckVersionProcessor(),
+						new EpubVersionProcessor(),
 						new IgnoreProcessor(), new ClassNotFoundProcessor(),
 						new FileNotFoundProcessor(), new CatchAllProcessor());
 
@@ -142,17 +143,28 @@ public final class OutputParser implements Function<InputStream, List<Issue>> {
 
 		}
 
-		private class VersionProcessor extends GenericIssueProcessor {
+		private class EpubVersionProcessor extends GenericIssueProcessor {
 
-			public VersionProcessor() {
-				super(Patterns.VERSION);
+			public EpubVersionProcessor() {
+				super(Patterns.EPUB_VERSION);
 			}
 
 			@Override
 			public void doProcess(MatchResult match) {
-				issue = new Issue(Type.VERSION, null, match.group(1));
+				issue = new Issue(Type.EPUB_VERSION, null, match.group(1));
 			}
 
+		}
+
+		private static class EpubcheckVersionProcessor extends GenericIssueProcessor {
+			public EpubcheckVersionProcessor() {
+				super(Patterns.EPUBCHECK_VERSION);
+			}
+
+			@Override
+			public void doProcess(MatchResult match) {
+				issue = new Issue(Type.EPUBCHECK_VERSION, null, match.group(1));
+			}
 		}
 
 		private static class IgnoreProcessor extends GenericIssueProcessor {
@@ -210,5 +222,4 @@ public final class OutputParser implements Function<InputStream, List<Issue>> {
 			}
 		}
 	}
-
 }
