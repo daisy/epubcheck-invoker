@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import com.google.common.io.Closeables;
 import com.google.common.io.LineProcessor;
 
 public class DataPump<T> implements Runnable {
@@ -39,9 +40,7 @@ public class DataPump<T> implements Runnable {
 					lineProcessor.processLine(line);
 				}
 			} finally {
-				if (bReader != null) {
-					bReader.close();
-				}
+				Closeables.closeQuietly(bReader);
 			}
 		} catch (final IOException ex) {
 			throw new RuntimeException(ex);

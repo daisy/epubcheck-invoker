@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeoutException;
 
 import org.daisy.validation.epubcheck.Issue.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.UncheckedTimeoutException;
 
 public final class EpubcheckBackend {
 
@@ -31,8 +31,8 @@ public final class EpubcheckBackend {
 	}
 
 	public List<Issue> validate(final File epubFile) {
-		Future<List<Issue>> result = config.executorService.get()
-				.submit(new Callable<List<Issue>>() {
+		Future<List<Issue>> result = config.executorService.get().submit(
+				new Callable<List<Issue>>() {
 
 					@Override
 					public List<Issue> call() {
@@ -56,17 +56,17 @@ public final class EpubcheckBackend {
 				Lists.newArrayList("java", "-jar", config.jar.get(),
 						epub.getPath()));
 		try {
-			return cmdExec.run(new OutputParser(epub),config.timeout.get(),config.timeoutUnit.get());
+			return cmdExec.run(new StatefulParser(epub),config.timeout.get(),config.timeoutUnit.get());
 		} catch (InterruptedException e) {
 			return Lists.newArrayList(new Issue(Type.INTERNAL_ERROR,
 					"InterruptedException - " + e.getMessage()));
-		} catch (ExecutionException e) {
-			return Lists.newArrayList(new Issue(Type.INTERNAL_ERROR,
-
-			e.getCause().getClass().getSimpleName() + " - " + e.getMessage()));
-		} catch (TimeoutException e) {
+		} catch (UncheckedTimeoutException e) {
 			return Lists.newArrayList(new Issue(Type.INTERNAL_ERROR,
 					"Process timed out"));
+		} catch (Exception e) {
+			return Lists.newArrayList(new Issue(Type.INTERNAL_ERROR,
+					
+					e.getCause().getClass().getSimpleName() + " - " + e.getMessage()));
 		}
 	}
 }
