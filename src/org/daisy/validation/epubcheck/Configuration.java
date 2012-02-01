@@ -3,9 +3,11 @@ package org.daisy.validation.epubcheck;
 import java.util.EnumSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Supplier;
+import com.google.common.util.concurrent.MoreExecutors;
 
 public class Configuration extends ReloadableConfiguration {
 
@@ -82,7 +84,9 @@ public class Configuration extends ReloadableConfiguration {
 			if (old != null) {
 				old.shutdown();
 			}
-			return Executors.newFixedThreadPool(size);
+			return MoreExecutors
+					.getExitingExecutorService((ThreadPoolExecutor) Executors
+							.newFixedThreadPool(size));
 		}
 	};
 
