@@ -1,20 +1,21 @@
 package org.daisy.validation.epubcheck;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import com.google.common.io.Closeables;
 
 public final class Utils {
 
@@ -52,19 +53,21 @@ public final class Utils {
 	 *         problem occurred
 	 */
 	public static List<String> getEntries(File zip) {
+		List<String> entries = Lists.newLinkedList();
+		ZipInputStream zis = null;
 		try {
-			return Lists.newArrayList(Iterators.transform(
-					Iterators.forEnumeration(new ZipFile(zip).entries()),
-					new Function<ZipEntry, String>() {
-						@Override
-						public String apply(ZipEntry entry) {
-							return entry.getName();
-						}
-					}));
+			zis = new ZipInputStream(new BufferedInputStream(
+					new FileInputStream(zip)));
+			ZipEntry entry;
+			while ((entry = zis.getNextEntry()) != null) {
+				entries.add(entry.getName());
+			}
 		} catch (IOException e) {
-			LOG.warn("Couldn't get entries for file {}", zip.getAbsolutePath());
-			return Lists.newArrayList();
+			LOG.warn("Couldn't get ZIP entries", e);
+		} finally {
+			Closeables.closeQuietly(zis);
 		}
+		return entries;
 	}
 
 	/**
