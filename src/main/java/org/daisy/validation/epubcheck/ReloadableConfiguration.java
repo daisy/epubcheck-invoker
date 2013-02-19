@@ -63,7 +63,7 @@ public abstract class ReloadableConfiguration {
 					} catch (Exception e) {
 						LOG.warn(
 								"Bad value '{}' for '{}', reverting to default {}",
-								new String[] { newString, def.getName(),
+								new Object[] { newString, def.getName(),
 										def.getValue() });
 						if (!def.getValue().equals(currentValue)) {
 							value = Suppliers.ofInstance(newValue(

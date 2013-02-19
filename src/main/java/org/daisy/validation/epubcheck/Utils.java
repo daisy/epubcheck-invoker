@@ -55,17 +55,19 @@ public final class Utils {
 	public static List<String> getEntries(File zip) {
 		List<String> entries = Lists.newLinkedList();
 		ZipInputStream zis = null;
-		try {
-			zis = new ZipInputStream(new BufferedInputStream(
-					new FileInputStream(zip)));
-			ZipEntry entry;
-			while ((entry = zis.getNextEntry()) != null) {
-				entries.add(entry.getName());
+		if (zip != null) {
+			try {
+				zis = new ZipInputStream(new BufferedInputStream(
+						new FileInputStream(zip)));
+				ZipEntry entry;
+				while ((entry = zis.getNextEntry()) != null) {
+					entries.add(entry.getName());
+				}
+			} catch (IOException e) {
+				LOG.warn("Couldn't get ZIP entries", e);
+			} finally {
+				Closeables.closeQuietly(zis);
 			}
-		} catch (IOException e) {
-			LOG.warn("Couldn't get ZIP entries", e);
-		} finally {
-			Closeables.closeQuietly(zis);
 		}
 		return entries;
 	}
@@ -73,7 +75,7 @@ public final class Utils {
 	/**
 	 * Normalizes the given file name by checking whether any of the given
 	 * entries is a substring of it and returning that. If no entry is found the
-	 * empty string is returned.
+	 * original string is returned.
 	 * 
 	 * @param entries
 	 *            file entries
@@ -90,7 +92,7 @@ public final class Utils {
 			public boolean apply(String entry) {
 				return filename.endsWith(entry);
 			}
-		}, "");
+		}, filename);
 	}
 
 }

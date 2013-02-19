@@ -65,7 +65,7 @@ public class StatefulParser implements LineProcessor<List<Issue>> {
 		return true;
 	}
 
-	public void doProcessLine(String line) {
+	private void doProcessLine(String line) {
 		for (LineProcessor<Issue> processor : processors) {
 			try {
 				if (processor.processLine(line)) {
@@ -122,7 +122,7 @@ public class StatefulParser implements LineProcessor<List<Issue>> {
 			issue = new Issue(Type.safeValueOf(matcher.group(1)),
 					Utils.normalizeFilename(entries.get(), matcher.group(2)),
 					Utils.toInt(matcher.group(3)),
-					Utils.toInt(matcher.group(4)), matcher.group(5));
+					Utils.toInt(matcher.group(5)), matcher.group(6));
 		}
 
 	}
