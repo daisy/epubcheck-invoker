@@ -40,15 +40,15 @@
       <organization>SBS.</organization>
     </developer>
   </developers>
-  <!-- <scm>
-    <connection>scm:svn:http://epubcheck.googlecode.com/svn/branches/epub3-maven/com.adobe.epubcheck</connection>
-    <developerConnection>scm:svn:https://epubcheck.googlecode.com/svn/branches/epub3-maven/com.adobe.epubcheck</developerConnection>
-    <url>http://code.google.com/p/epubcheck/source/browse/#svn%2Fbranches%2Fepub3-maven%2Fcom.adobe.epubcheck</url>
-  </scm> -->
-  <!-- <issueManagement>
-    <system>Google Code</system>
-    <url>http://code.google.com/p/epubcheck/issues/list</url>
-  </issueManagement> -->
+  <scm>
+    <connection>scm:git:https://github.com/daisy-consortium/epubcheck-invoker.git</connection>
+    <developerConnection>scm:git:https://github.com/daisy-consortium/epubcheck-invoker.git</developerConnection>
+    <url>https://github.com/daisy-consortium/epubcheck-invoker</url>
+  </scm>
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/daisy-consortium/epubcheck-invoker/issues</url>
+  </issueManagement>
 
   <properties>
     <java.version>1.6</java.version>
