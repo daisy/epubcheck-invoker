@@ -49,6 +49,18 @@ public class ParserTest {
 	}
 	
 	@Test
+	public void testValid() {
+		parser.processLine("Epubcheck Version 3.0");
+		parser.processLine("");
+		parser.processLine("Validating against EPUB version 2.0");
+		parser.processLine("No errors or warnings detected.");
+		List<Issue> issues = parser.getResult();
+		assertEquals(2,issues.size());
+		assertEquals(Issue.Type.EPUBCHECK_VERSION,issues.get(0).type);
+		assertEquals(Issue.Type.EPUB_VERSION,issues.get(1).type);
+	}
+	
+	@Test
 	public void testIssue_NoCol() {
 		parser.processLine("WARNING: tycpp-sample.epub/OEBPS/Styles/stylesheet.css(1288): Token '<' not allowed here");
 		List<Issue> issues = parser.getResult();
