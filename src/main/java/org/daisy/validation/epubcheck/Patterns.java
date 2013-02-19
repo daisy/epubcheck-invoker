@@ -7,12 +7,14 @@ final class Patterns {
 	static final Pattern ANY = Pattern.compile(".*");
 	static final Pattern CAUSED_BY = Pattern.compile("^Caused by:");
 	static final Pattern CLASS_NOT_FOUND = Pattern
-			.compile(".*java.lang.NoClassDefFoundError: .*");
+			.compile(".*java.lang.NoClassDefFoundError: (.*)");
+	static final Pattern NPE = Pattern
+			.compile(".*java.lang.NullPointerException: (.*)");
 	static final Pattern FILE_NOT_FOUND = Pattern
 			.compile(".*File (.*) does not exist!.*");
-	static final Pattern INDENTED = Pattern.compile("^\\s+");
+	static final Pattern INDENTED = Pattern.compile("^\\s+.*");
 	static final Pattern IRRELEVANT = Pattern
-			.compile("^\\s*$|Check finished with warnings or errors!|Epubcheck Version \\S+|No errors or warnings detected.");
+			.compile("^\\s*$|Check finished with warnings or errors|Epubcheck Version \\S+|No errors or warnings detected.");
 	static final Pattern ISSUE = Pattern
 			.compile("^(ERROR|WARNING): (.*?)(?:\\((\\d+)(,(\\d+))?\\))?: (.*)");
 	static final Pattern EPUB_VERSION = Pattern

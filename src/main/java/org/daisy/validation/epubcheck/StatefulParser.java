@@ -19,8 +19,9 @@ import com.google.common.io.LineProcessor;
 
 public class StatefulParser implements LineProcessor<List<Issue>> {
 
-	private static final Logger LOG = LoggerFactory.getLogger(StatefulParser.class);
-	
+	private static final Logger LOG = LoggerFactory
+			.getLogger(StatefulParser.class);
+
 	private static enum State {
 		PROCESS, IGNORE_STACK_TRACE
 	};
@@ -29,10 +30,11 @@ public class StatefulParser implements LineProcessor<List<Issue>> {
 	private final Supplier<List<String>> entries;
 	private final List<Issue> issues = Lists.newLinkedList();
 	private final List<? extends LineProcessor<Issue>> processors = Lists
-			.newArrayList(new IssueProcessor(), new EpubcheckVersionProcessor(),
-					new EpubVersionProcessor(),
-					new IgnoreProcessor(), new ClassNotFoundProcessor(),
-					new FileNotFoundProcessor(), new CatchAllProcessor());
+			.newArrayList(new IssueProcessor(),
+					new EpubcheckVersionProcessor(),
+					new EpubVersionProcessor(), new IgnoreProcessor(),
+					new ClassNotFoundProcessor(), new FileNotFoundProcessor(),
+					new NPEProcessor(), new CatchAllProcessor());
 
 	public StatefulParser(final File epub) {
 		this.entries = Suppliers.memoize(new Supplier<List<String>>() {
@@ -75,15 +77,15 @@ public class StatefulParser implements LineProcessor<List<Issue>> {
 					return;
 				}
 			} catch (IOException e) {
-				LOG.warn("Unexpected IOException: {}",e.getMessage());
-				issues.add(new Issue(Type.INTERNAL_ERROR,e.getMessage()));
+				LOG.warn("Unexpected IOException: {}", e.getMessage());
+				issues.add(new Issue(Type.INTERNAL_ERROR, e.getMessage()));
 			}
 		}
-		throw new RuntimeException("No line processor caught this line:"
-				+ line);
+		throw new RuntimeException("No line processor caught this line:" + line);
 	}
 
-	private class ClassNotFoundProcessor extends StatefulParser.GenericIssueProcessor {
+	private class ClassNotFoundProcessor extends
+			StatefulParser.GenericIssueProcessor {
 
 		public ClassNotFoundProcessor() {
 			super(Patterns.CLASS_NOT_FOUND, new Issue(Type.INTERNAL_ERROR,
@@ -96,10 +98,26 @@ public class StatefulParser implements LineProcessor<List<Issue>> {
 		}
 	}
 
-	private class FileNotFoundProcessor extends StatefulParser.GenericIssueProcessor {
+	private class FileNotFoundProcessor extends
+			StatefulParser.GenericIssueProcessor {
 
 		public FileNotFoundProcessor() {
 			super(Patterns.FILE_NOT_FOUND);
+		}
+
+		@Override
+		public void doProcess(MatchResult match) {
+			issue = new Issue(Type.INTERNAL_ERROR, match.group(1),
+					match.group());
+			state = State.IGNORE_STACK_TRACE;
+		}
+
+	}
+
+	private class NPEProcessor extends StatefulParser.GenericIssueProcessor {
+
+		public NPEProcessor() {
+			super(Patterns.NPE);
 		}
 
 		@Override
@@ -127,7 +145,8 @@ public class StatefulParser implements LineProcessor<List<Issue>> {
 
 	}
 
-	private class EpubVersionProcessor extends StatefulParser.GenericIssueProcessor {
+	private class EpubVersionProcessor extends
+			StatefulParser.GenericIssueProcessor {
 
 		public EpubVersionProcessor() {
 			super(Patterns.EPUB_VERSION);
@@ -140,7 +159,8 @@ public class StatefulParser implements LineProcessor<List<Issue>> {
 
 	}
 
-	private static class EpubcheckVersionProcessor extends StatefulParser.GenericIssueProcessor {
+	private static class EpubcheckVersionProcessor extends
+			StatefulParser.GenericIssueProcessor {
 		public EpubcheckVersionProcessor() {
 			super(Patterns.EPUBCHECK_VERSION);
 		}
@@ -151,7 +171,8 @@ public class StatefulParser implements LineProcessor<List<Issue>> {
 		}
 	}
 
-	private static class IgnoreProcessor extends StatefulParser.GenericIssueProcessor {
+	private static class IgnoreProcessor extends
+			StatefulParser.GenericIssueProcessor {
 
 		public IgnoreProcessor() {
 			super(Patterns.IRRELEVANT);
@@ -159,7 +180,8 @@ public class StatefulParser implements LineProcessor<List<Issue>> {
 
 	}
 
-	private static class CatchAllProcessor extends StatefulParser.GenericIssueProcessor {
+	private static class CatchAllProcessor extends
+			StatefulParser.GenericIssueProcessor {
 
 		public CatchAllProcessor() {
 			super(Patterns.ANY);
@@ -172,8 +194,7 @@ public class StatefulParser implements LineProcessor<List<Issue>> {
 		}
 	}
 
-	private static class GenericIssueProcessor implements
-			LineProcessor<Issue> {
+	private static class GenericIssueProcessor implements LineProcessor<Issue> {
 
 		protected Issue issue;
 		private final Pattern pattern;

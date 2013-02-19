@@ -58,7 +58,18 @@ public class ParserTest {
 		assertEquals("tycpp-sample.epub/OEBPS/Styles/stylesheet.css",issues.get(0).file);
 		assertEquals(1288,issues.get(0).lineNo);
 		assertEquals(-1,issues.get(0).colNo);
-		
+	}
+	
+	@Test
+	public void testIssue_NoLineNoCol() {
+		parser.processLine("WARNING: EmptyDir.epub: zip file contains empty directory emptyDir/");
+		List<Issue> issues = parser.getResult();
+		assertEquals(1,issues.size());
+		assertEquals(Issue.Type.WARNING,issues.get(0).type);
+		assertEquals("zip file contains empty directory emptyDir/",issues.get(0).txt);
+		assertEquals("EmptyDir.epub",issues.get(0).file);
+		assertEquals(-1,issues.get(0).lineNo);
+		assertEquals(-1,issues.get(0).colNo);
 	}
 	
 	@Test
@@ -71,6 +82,18 @@ public class ParserTest {
 		assertEquals("invalid-ncx.epub/EPUB/lorem.ncx",issues.get(0).file);
 		assertEquals(20,issues.get(0).lineNo);
 		assertEquals(46,issues.get(0).colNo);
+	}
+	
+	@Test
+	public void testException() {
+		parser.processLine("java.lang.NullPointerException: name");
+		parser.processLine("	at java.util.zip.ZipFile.getEntry(ZipFile.java:156)");
+		parser.processLine("	at com.adobe.epubcheck.ocf.OCFZipPackage.getInputStream(OCFZipPackage.java:42)");
+		parser.processLine("Validating against EPUB version 2.0");
+		List<Issue> issues = parser.getResult();
+		assertEquals(2,issues.size());
+		assertEquals(Issue.Type.INTERNAL_ERROR,issues.get(0).type);
+		assertEquals(Issue.Type.EPUB_VERSION,issues.get(1).type);
 		
 	}
 
