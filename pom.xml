@@ -72,13 +72,18 @@
       <artifactId>junit</artifactId>
       <version>4.10</version>
       <scope>test</scope>
-    </dependency> 
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>1.7.2</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>2.3.2</version>
         <configuration>
@@ -86,6 +91,41 @@
           <target>${java.version}</target>
         </configuration>
       </plugin>
+      <plugin>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>2.13</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.7</version>
+        <executions>
+          <execution>
+            <id>download-epubcheck</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <!-- <echo  -->
+                <mkdir dir="${project.build.directory}/download" />
+                <get dest="${project.build.directory}/download/epubcheck-3.0.zip" src="http://epubcheck.googlecode.com/files/epubcheck-3.0.zip" usetimestamp="true" />
+                <unzip dest="${project.build.directory}" src="${project.build.directory}/download/epubcheck-3.0.zip" />
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+
     </plugins>
   </build>
 
