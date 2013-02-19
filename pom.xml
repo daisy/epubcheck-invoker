@@ -11,7 +11,7 @@
 
   <groupId>org.daisy.validation</groupId>
   <artifactId>epubcheck-invoker</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0</version>
   <packaging>jar</packaging>
 
   <name>EpubCheck Invoker</name>
@@ -115,7 +115,7 @@
             </goals>
             <configuration>
               <target>
-                <!-- <echo  -->
+                <!-- <echo -->
                 <mkdir dir="${project.build.directory}/download" />
                 <get dest="${project.build.directory}/download/epubcheck-3.0.zip" src="http://epubcheck.googlecode.com/files/epubcheck-3.0.zip" usetimestamp="true" />
                 <unzip dest="${project.build.directory}" src="${project.build.directory}/download/epubcheck-3.0.zip" />
