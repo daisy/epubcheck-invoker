@@ -8,8 +8,8 @@ final class Patterns {
 	static final Pattern CAUSED_BY = Pattern.compile("^Caused by:");
 	static final Pattern CLASS_NOT_FOUND = Pattern
 			.compile(".*java.lang.NoClassDefFoundError: (.*)");
-	static final Pattern NPE = Pattern
-			.compile(".*java.lang.NullPointerException: (.*)");
+	static final Pattern EXCEPTION = Pattern
+			.compile(".*java.lang.[^\\s]*Exception: (.*)");
 	static final Pattern FILE_NOT_FOUND = Pattern
 			.compile(".*File (.*) does not exist!.*");
 	static final Pattern INDENTED = Pattern.compile("^\\s+.*");

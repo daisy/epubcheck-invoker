@@ -34,7 +34,7 @@ public class StatefulParser implements LineProcessor<List<Issue>> {
 					new EpubcheckVersionProcessor(),
 					new EpubVersionProcessor(), new IgnoreProcessor(),
 					new ClassNotFoundProcessor(), new FileNotFoundProcessor(),
-					new NPEProcessor(), new CatchAllProcessor());
+					new ExceptionProcessor(), new CatchAllProcessor());
 
 	public StatefulParser(final File epub) {
 		this.entries = Suppliers.memoize(new Supplier<List<String>>() {
@@ -114,16 +114,16 @@ public class StatefulParser implements LineProcessor<List<Issue>> {
 
 	}
 
-	private class NPEProcessor extends StatefulParser.GenericIssueProcessor {
+	private class ExceptionProcessor extends StatefulParser.GenericIssueProcessor {
 
-		public NPEProcessor() {
-			super(Patterns.NPE);
+		public ExceptionProcessor() {
+			super(Patterns.EXCEPTION);
 		}
 
 		@Override
 		public void doProcess(MatchResult match) {
-			issue = new Issue(Type.INTERNAL_ERROR, match.group(1),
-					match.group());
+			issue = new Issue(Type.INTERNAL_ERROR, null,
+					match.group(1));
 			state = State.IGNORE_STACK_TRACE;
 		}
 

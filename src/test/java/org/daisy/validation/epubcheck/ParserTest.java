@@ -86,6 +86,16 @@ public class ParserTest {
 	
 	@Test
 	public void testException() {
+		parser.processLine("java.lang.RuntimeException: For files other than epubs, mode must be specified! Default version is 3.0.");
+		List<Issue> issues = parser.getResult();
+		assertEquals(1,issues.size());
+		assertEquals(Issue.Type.INTERNAL_ERROR,issues.get(0).type);
+		assertEquals("For files other than epubs, mode must be specified! Default version is 3.0.",issues.get(0).txt);
+		
+	}
+	
+	@Test
+	public void testException_IngoresStackTrace() {
 		parser.processLine("java.lang.NullPointerException: name");
 		parser.processLine("	at java.util.zip.ZipFile.getEntry(ZipFile.java:156)");
 		parser.processLine("	at com.adobe.epubcheck.ocf.OCFZipPackage.getInputStream(OCFZipPackage.java:42)");
