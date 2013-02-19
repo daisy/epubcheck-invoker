@@ -13,12 +13,12 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.UncheckedTimeoutException;
 
-public final class EpubcheckBackend {
+public final class EpubCheckInvoker {
 
 	private static final Logger LOG = LoggerFactory
-			.getLogger(EpubcheckBackend.class);
+			.getLogger(EpubCheckInvoker.class);
 
-	private static final EpubcheckBackend INSTANCE = new EpubcheckBackend();
+	private static final EpubCheckInvoker INSTANCE = new EpubCheckInvoker();
 
 	public static List<Issue> run(String file) {
 		return INSTANCE.validate(file);

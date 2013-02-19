@@ -18,7 +18,7 @@ public class EpubCheckIT {
 
 	@Test
 	public void testValid() {
-		List<Issue> issues = EpubcheckBackend.run("src/test/resources/epub/valid.epub");
+		List<Issue> issues = EpubCheckInvoker.run("src/test/resources/epub/valid.epub");
 		assertEquals(2,issues.size());
 		assertEquals(Issue.Type.EPUBCHECK_VERSION,issues.get(0).type);
 		assertEquals(Issue.Type.EPUB_VERSION,issues.get(1).type);
@@ -26,7 +26,7 @@ public class EpubCheckIT {
 	
 	@Test
 	public void testInvalid() {
-		List<Issue> issues = EpubcheckBackend.run("src/test/resources/epub/invalid-ncx.epub");
+		List<Issue> issues = EpubCheckInvoker.run("src/test/resources/epub/invalid-ncx.epub");
 		assertEquals(4,issues.size());
 		assertEquals(Issue.Type.ERROR,issues.get(2).type);
 		assertEquals(Issue.Type.ERROR,issues.get(3).type);
@@ -39,7 +39,7 @@ public class EpubCheckIT {
 
 	@Test
 	public void test_FileNotFound() throws IOException {
-		List<Issue> issues = EpubcheckBackend.run("foobar.epub");
+		List<Issue> issues = EpubCheckInvoker.run("foobar.epub");
 		assertEquals(2, issues.size());
 		assertEquals(Type.INTERNAL_ERROR, issues.get(1).type);
 		assertEquals("File foobar.epub does not exist", issues.get(1).txt);
