@@ -26,6 +26,7 @@ public class StatefulParser implements LineProcessor<List<Issue>> {
 		PROCESS, IGNORE_STACK_TRACE
 	};
 
+	private final boolean quiet;
 	private StatefulParser.State state = State.PROCESS;
 	private final Supplier<List<String>> entries;
 	private final List<Issue> issues = Lists.newLinkedList();
@@ -37,14 +38,15 @@ public class StatefulParser implements LineProcessor<List<Issue>> {
 					new ExceptionProcessor(), new CatchAllProcessor());
 
 	public StatefulParser(final File epub) {
+		this.quiet = epub == null;
 		this.entries = Suppliers.memoize(new Supplier<List<String>>() {
-			@Override
-			public List<String> get() {
-				return Utils.getEntries(epub);
-			}
+		    @Override
+		    public List<String> get() {
+		        return Utils.getEntries(epub);
+		    }
 		});
 	}
-
+	
 	@Override
 	public List<Issue> getResult() {
 		return Collections.unmodifiableList(issues);
@@ -180,7 +182,7 @@ public class StatefulParser implements LineProcessor<List<Issue>> {
 
 	}
 
-	private static class CatchAllProcessor extends
+	private class CatchAllProcessor extends
 			StatefulParser.GenericIssueProcessor {
 
 		public CatchAllProcessor() {
@@ -189,8 +191,10 @@ public class StatefulParser implements LineProcessor<List<Issue>> {
 
 		@Override
 		public void doProcess(MatchResult matcher) {
-			System.err.println("unexpected output on stderr:<"
-					+ matcher.group() + ">");
+		    if (!quiet) {
+		        System.err.println("unexpected output on stderr:<"
+		                + matcher.group() + ">");
+		    }
 		}
 	}
 
