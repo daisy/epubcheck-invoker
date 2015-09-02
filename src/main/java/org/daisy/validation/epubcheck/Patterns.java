@@ -11,14 +11,14 @@ final class Patterns {
 	static final Pattern EXCEPTION = Pattern
 			.compile(".*java.lang.[^\\s]*Exception: (.*)");
 	static final Pattern FILE_NOT_FOUND = Pattern
-			.compile(".*File (.*) does not exist!.*");
+			.compile(".*File not found: '(.*)'.*");
 	static final Pattern INDENTED = Pattern.compile("^\\s+.*");
 	static final Pattern IRRELEVANT = Pattern
-			.compile("^\\s*$|Check finished with warnings or errors|Epubcheck Version \\S+|No errors or warnings detected.");
+			.compile("^\\s*$|Check finished with errors|Check finished with warnings|EpubCheck v\\S+|No errors or warnings detected.|epubcheck completed");
 	static final Pattern ISSUE = Pattern
-			.compile("^(ERROR|WARNING): (.*?)(?:\\((\\d+)(,(\\d+))?\\))?: (.*)");
+			.compile("^(ERROR|WARNING|INFO|USAGE)\\(\\S+\\): (.*?)(?:\\((\\d+)(,(\\d+))?\\))?: (.*)");
 	static final Pattern EPUB_VERSION = Pattern
-			.compile("Validating against EPUB version (\\S+)");
-	static final Pattern EPUBCHECK_VERSION = Pattern.compile("Epubcheck Version (.*)");
+			.compile("Validating using EPUB version (\\S+) rules.");
+	static final Pattern EPUBCHECK_VERSION = Pattern.compile("EpubCheck v(.*)");
 
 }

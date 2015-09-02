@@ -11,7 +11,7 @@
 
   <groupId>org.daisy.validation</groupId>
   <artifactId>epubcheck-invoker</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>EpubCheck Invoker</name>
@@ -52,6 +52,7 @@
 
   <properties>
     <java.version>1.6</java.version>
+    <epubcheck.version>4.0.0</epubcheck.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
@@ -82,6 +83,15 @@
   </dependencies>
 
   <build>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <includes>
+          <include>epubcheck-backend.properties</include>
+        </includes>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -117,8 +127,8 @@
               <target>
                 <!-- <echo -->
                 <mkdir dir="${project.build.directory}/download" />
-                <get dest="${project.build.directory}/download/epubcheck-3.0.zip" src="http://epubcheck.googlecode.com/files/epubcheck-3.0.zip" usetimestamp="true" />
-                <unzip dest="${project.build.directory}" src="${project.build.directory}/download/epubcheck-3.0.zip" />
+                <get dest="${project.build.directory}/download/epubcheck-${epubcheck.version}.zip" src="https://github.com/IDPF/epubcheck/releases/download/v${epubcheck.version}/epubcheck-${epubcheck.version}.zip" usetimestamp="true" />
+                <unzip dest="${project.build.directory}" src="${project.build.directory}/download/epubcheck-${epubcheck.version}.zip" />
               </target>
             </configuration>
           </execution>

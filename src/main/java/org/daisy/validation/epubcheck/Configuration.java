@@ -20,7 +20,7 @@ public class Configuration extends ReloadableConfiguration {
 	}
 
 	public static enum Items implements Default {
-		JAR("epubcheck.jar", "epubcheck/epubcheck-3.0b4.jar"), TIMEOUT(
+		JAR("epubcheck.jar", "epubcheck/epubcheck.jar"), TIMEOUT(
 				"epubcheck.timeout", "10"), TIMEOUT_UNIT(
 				"epubcheck.timeout.unit", "MINUTES"), POOL_SIZE(
 				"epubcheck.poolsize", "10");
