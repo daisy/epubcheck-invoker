@@ -15,11 +15,6 @@ public class DataPump<T> implements Runnable {
 
 	/**
 	 * Connect pump from an Input Stream to a String Buffer
-	 * 
-	 * @param is
-	 *            Data Source
-	 * @param buffer
-	 *            Data Buffer (holding pond)
 	 */
 	public DataPump(final InputStream is, final LineProcessor<T> lineProcessor) {
 		this.is = is;
