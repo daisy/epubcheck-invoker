@@ -97,6 +97,14 @@ public class ParserTest {
 		assertEquals(46,issues.get(0).colNo);
 	}
 	
+    @Test
+    public void testIssue_Fatal() {
+        parser.processLine("FATAL(PKG-008): ./test.epub/OEBPS/Text/doc.html(-1,-1): Unable to read file 'OEBPS/Text/Section0002.html'.");
+        List<Issue> issues = parser.getResult();
+        assertEquals(1,issues.size());
+        assertEquals(Issue.Type.FATAL,issues.get(0).type);
+    }
+	
 	@Test
 	public void testException() {
 		parser.processLine("java.lang.RuntimeException: For files other than epubs, mode must be specified! Default version is 3.0.");
