@@ -84,6 +84,17 @@ public class ParserTest {
 		assertEquals(-1,issues.get(0).lineNo);
 		assertEquals(-1,issues.get(0).colNo);
 	}
+
+    @Test
+    public void testIssue_NegativeLineCol() {
+        parser.processLine("WARNING(XXX-001): sample.epub/file(-1,-1): message");
+        List<Issue> issues = parser.getResult();
+        assertEquals(1,issues.size());
+        assertEquals(Issue.Type.WARNING,issues.get(0).type);
+        assertEquals("sample.epub/file",issues.get(0).file);
+        assertEquals(-1,issues.get(0).lineNo);
+        assertEquals(-1,issues.get(0).colNo);
+    }
 	
 	@Test
 	public void testIssue_Error() {

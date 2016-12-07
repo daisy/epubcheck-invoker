@@ -16,7 +16,7 @@ final class Patterns {
 	static final Pattern IRRELEVANT = Pattern
 			.compile("^\\s*$|Check finished with errors|Check finished with warnings|EpubCheck v\\S+|No errors or warnings detected.|epubcheck completed");
 	static final Pattern ISSUE = Pattern
-			.compile("^(FATAL|ERROR|WARNING|INFO|USAGE)\\(\\S+\\): (.*?)(?:\\((\\d+)(,(\\d+))?\\))?: (.*)");
+			.compile("^(FATAL|ERROR|WARNING|INFO|USAGE)\\(\\S+\\): (.*?)(?:\\((-?\\d+)(,(-?\\d+))?\\))?: (.*)");
 	static final Pattern EPUB_VERSION = Pattern
 			.compile("Validating using EPUB version (\\S+) rules.");
 	static final Pattern EPUBCHECK_VERSION = Pattern.compile("EpubCheck v(.*)");
