@@ -52,7 +52,7 @@
 
   <properties>
     <java.version>1.6</java.version>
-    <epubcheck.version>4.0.0</epubcheck.version>
+    <epubcheck.version>4.0.2</epubcheck.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
