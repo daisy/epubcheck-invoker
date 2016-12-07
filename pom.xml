@@ -41,13 +41,13 @@
     </developer>
   </developers>
   <scm>
-    <connection>scm:git:https://github.com/daisy-consortium/epubcheck-invoker.git</connection>
-    <developerConnection>scm:git:https://github.com/daisy-consortium/epubcheck-invoker.git</developerConnection>
-    <url>https://github.com/daisy-consortium/epubcheck-invoker</url>
+    <connection>scm:git:https://github.com/daisy/epubcheck-invoker.git</connection>
+    <developerConnection>scm:git:https://github.com/daisy/epubcheck-invoker.git</developerConnection>
+    <url>https://github.com/daisy/epubcheck-invoker</url>
   </scm>
   <issueManagement>
     <system>GitHub</system>
-    <url>https://github.com/daisy-consortium/epubcheck-invoker/issues</url>
+    <url>https://github.com/daisy/epubcheck-invoker/issues</url>
   </issueManagement>
 
   <properties>

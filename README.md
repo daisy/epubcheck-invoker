@@ -1,7 +1,8 @@
 epubcheck-invoker
 =================
 
-[![Build Status](https://travis-ci.org/daisy
+[![Build Status](https://travis-ci.org/daisy/epubcheck-invoker.png?branch=master)](https://travis-ci.org/daisy/epubcheck-invoker)
+
 
 A Java utility library to invoke EpubCheck as an external process.
 
