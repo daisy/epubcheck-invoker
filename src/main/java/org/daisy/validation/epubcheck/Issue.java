@@ -18,7 +18,7 @@ public final class Issue {
 			try {
 				return valueOf(name);
 			} catch (IllegalArgumentException e) {
-				LOG.warn("Illegal argument in Type#sageValueOf: {}", name);
+				LOG.warn("Illegal argument in Type#safeValueOf: {}", name);
 				return INTERNAL_ERROR;
 			}
 		}
