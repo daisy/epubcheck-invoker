@@ -35,7 +35,7 @@ public final class EpubCheckInvoker {
         @Override
         public String get() {
             List<Issue> results = validate((File) null);
-            if (!results.isEmpty() || results.get(0).type == Type.EPUBCHECK_VERSION) {
+            if (!results.isEmpty() && results.get(0).type == Type.EPUBCHECK_VERSION) {
                 return results.get(0).txt;
             } else {
                 return "unknown";
