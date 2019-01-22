@@ -16,7 +16,7 @@
 
   <name>EPUBCheck Invoker</name>
   <description>Utility library to invoke EPUBCheck as an external process. The validation output is parsed as a list of issues, for easier reporting in UIs.</description>
-  <url>http://code.google.com/p/epubcheck/</url>
+  <url>https://github.com/daisy/epubcheck-invoker</url>
   <inceptionYear>2011</inceptionYear>
   <organization>
     <name>DAISY Consortium</name>
@@ -24,7 +24,7 @@
   </organization>
   <licenses>
     <license>
-      <name>New BSD License</name>
+      <name>BSD 3-Clause License</name>
       <url>http://www.opensource.org/licenses/bsd-license.php</url>
     </license>
   </licenses>
