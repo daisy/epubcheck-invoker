@@ -14,11 +14,18 @@ final class Patterns {
 			.compile(".*File not found: '(.*)'.*");
 	static final Pattern INDENTED = Pattern.compile("^\\s+.*");
 	static final Pattern IRRELEVANT = Pattern
-			.compile("^\\s*$|Check finished with errors|Check finished with warnings|EpubCheck v\\S+|No errors or warnings detected.|epubcheck completed");
+			.compile("^\\s*$"
+					+ "|Check finished with errors"
+					+ "|Check finished with warnings"
+					+ "|EPUBCheck v\\S+"
+					+ "|No errors or warnings detected."
+					+ "|EPUBCheck completed"
+					+ "|Messages: (\\d+) fatal / (\\d+) errors / (\\d+) warnings / (\\d+) info",
+					Pattern.CASE_INSENSITIVE);
 	static final Pattern ISSUE = Pattern
 			.compile("^(FATAL|ERROR|WARNING|INFO|USAGE)\\(\\S+\\): (.*?)(?:\\((-?\\d+)(,(-?\\d+))?\\))?: (.*)");
 	static final Pattern EPUB_VERSION = Pattern
 			.compile("Validating using EPUB version (\\S+) rules.");
-	static final Pattern EPUBCHECK_VERSION = Pattern.compile("EpubCheck v(.*)");
+	static final Pattern EPUBCHECK_VERSION = Pattern.compile("EPUBCheck v(.*)", Pattern.CASE_INSENSITIVE);
 
 }

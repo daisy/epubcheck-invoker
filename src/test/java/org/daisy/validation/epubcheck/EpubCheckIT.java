@@ -26,7 +26,6 @@ public class EpubCheckIT {
     public void testValid() {
         List<Issue> issues = EpubCheckInvoker.run("src/test/resources/epub/valid.epub");
         assertEquals(1, issues.size());
-        // assertEquals(Issue.Type.EPUBCHECK_VERSION,issues.get(0).type);
         assertEquals(Issue.Type.EPUB_VERSION, issues.get(0).type);
     }
 
@@ -34,7 +33,6 @@ public class EpubCheckIT {
     public void testValidWithInfo() {
         List<Issue> issues = EpubCheckInvoker.run("src/test/resources/epub/valid-info.epub");
         assertEquals(2, issues.size());
-        // assertEquals(Issue.Type.EPUBCHECK_VERSION,issues.get(0).type);
         assertEquals(Issue.Type.EPUB_VERSION, issues.get(0).type);
         assertEquals(Issue.Type.INFO, issues.get(1).type);
         assertEquals("OPF declares type 'edupub', validating using profile 'EDUPUB'.", issues.get(1).txt);

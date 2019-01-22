@@ -17,7 +17,7 @@ public class UtilsTest {
 	public void testGetEntries() {
 		List<String> entries = Utils.getEntries(new File(
 				"src/test/resources/epub/valid.epub"));
-		List<String> expected = Lists.newArrayList("mimetype","EPUB/lorem.xhtml","EPUB/lorem.css","EPUB/lorem.opf","META-INF/container.xml");
+		List<String> expected = Lists.newArrayList("mimetype","OPS/content_001.xhtml","OPS/nav.xhtml","OPS/package.opf","META-INF/container.xml", "META-INF/", "OPS/");
 		assertThat(entries, is(expected));
 	}
 
